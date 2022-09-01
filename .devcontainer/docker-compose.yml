@@ -35,6 +35,11 @@ services:
 
     # Add "forwardPorts": ["27017"] to **devcontainer.json** to forward MongoDB locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
-
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    volumes:
+      - meili-data:/meili_data
+    network_mode: service:mongodb
 volumes:
   mongodb-data:
+  meili-data:

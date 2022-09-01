@@ -17,7 +17,8 @@
 	// Exposes NodeBB and MongoDB ports locally with labels
 	"forwardPorts": [
 		4567,
-		27017
+		27017,
+		7700
 	],
 	"portsAttributes": {
 		"4567": {
@@ -27,6 +28,10 @@
 		},
 		"27017": {
 			"label": "MongoDB",
+			"onAutoForward": "silent"
+		},
+		"7700": {
+			"label": "Meilisearch",
 			"onAutoForward": "silent"
 		}
 	},
