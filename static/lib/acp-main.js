@@ -9,10 +9,10 @@ $(document).ready(function () {
 
 		Some events you can elect to listen for:
 
-		$(document).ready();			Fired when the DOM is ready
+		$(document).ready(); Fired when the DOM is ready
 		$(window).on('action:ajaxify.end', function(data) { ... });			"data" contains "url"
 	*/
 
-	console.log('nodebb-plugin-quickstart: acp-loaded');
+	console.log('nodebb-plugin-meilisearch: acp-loaded');
 	// Note how this is shown in the console on the first load of every page in the ACP
 });

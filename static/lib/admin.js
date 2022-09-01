@@ -2,27 +2,27 @@
 
 /*
 	This file is located in the "modules" block of plugin.json
-	It is only loaded when the user navigates to /admin/plugins/quickstart page
+	It is only loaded when the user navigates to /admin/plugins/meilisearch page
 	It is not bundled into the min file that is served on the first load of the page.
 */
-define('admin/plugins/quickstart', [
+define('admin/plugins/meilisearch', [
 	'settings', 'uploader', 'alerts',
 ], function (settings, uploader, alerts) {
 	var ACP = {};
 
 	ACP.init = function () {
 		setupUploader();
-		settings.load('quickstart', $('.quickstart-settings'), function () {
+		settings.load('meilisearch', $('.meilisearch-settings'), function () {
 			setupColorInputs();
 		});
 		$('#save').on('click', saveSettings);
 	};
 
 	function saveSettings() {
-		settings.save('quickstart', $('.quickstart-settings'), function () {
+		settings.save('meilisearch', $('.meilisearch-settings'), function () {
 			alerts.alert({
 				type: 'success',
-				alert_id: 'quickstart-saved',
+				alert_id: 'meilisearch-saved',
 				title: 'Settings Saved',
 				message: 'Please reload your NodeBB to apply these settings',
 				clickfn: function () {
@@ -52,7 +52,7 @@ define('admin/plugins/quickstart', [
 				uploader.show({
 					route: config.relative_path + '/api/admin/upload/file',
 					params: {
-						folder: 'quickstart',
+						folder: 'meilisearch',
 					},
 					accept: 'image/*',
 				}, function (image) {

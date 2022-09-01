@@ -1,17 +1,78 @@
 {
-	"id": "nodebb-plugin-quickstart",
-	"url": "https://github.com/NodeBB/nodebb-plugin-quickstart",
+	"id": "nodebb-plugin-meilisearch",
+	"url": "https://github.com/NodeBB/nodebb-plugin-meilisearch",
 	"library": "./library.js",
 	"hooks": [
-		{ "hook": "static:app.load", "method": "init" },
-		{ "hook": "static:api.routes", "method": "addRoutes" },
-		{ "hook": "filter:admin.header.build", "method": "addAdminNavigation" }
+		{
+			"hook": "static:app.load",
+			"method": "init"
+		},
+		{
+			"hook": "static:api.routes",
+			"method": "addRoutes"
+		},
+		{
+			"hook": "filter:admin.header.build",
+			"method": "addAdminNavigation"
+		},
+		{
+			"hook": "filter:admin.notices",
+			"method": "getNotices"
+		},
+		{
+			"hook": "action:post.save",
+			"method": "indexPost"
+		},
+		{
+			"hook": "action:post.edit",
+			"method": "indexPost"
+		},
+		{
+			"hook": "action:post.move",
+			"method": "indexPost"
+		},
+		{
+			"hook": "action:post.restore",
+			"method": "indexPost"
+		},
+		{
+			"hook": "action:post.delete",
+			"method": "deindexPost"
+		},
+		{
+			"hook": "action:topic.post",
+			"method": "indexTopic"
+		},
+		{
+			"hook": "action:topic.restore",
+			"method": "indexTopic"
+		},
+		{
+			"hook": "action:topic.edit",
+			"method": "indexTopic"
+		},
+		{
+			"hook": "action:topic.move",
+			"method": "indexTopic"
+		},
+		{
+			"hook": "action:topic.delete",
+			"method": "deindexTopic"
+		},
+		{
+			"hook": "filter:search.query",
+			"method": "search"
+		},
+		{
+			"hook": "filter:topic.search",
+			"method": "search"
+		}
 	],
 	"staticDirs": {
 		"static": "./static"
 	},
 	"less": [
-		"static/less/quickstart.less"
+		"static/less/meilisearch.less"
 	],
 	"scripts": [
 		"static/lib/main.js"
@@ -20,8 +81,8 @@
 		"static/lib/acp-main.js"
 	],
 	"modules": {
-		"../client/quickstart.js": "./static/lib/quickstart.js",
-		"../admin/plugins/quickstart.js": "./static/lib/admin.js"
+		"../client/meilisearch.js": "./static/lib/meilisearch.js",
+		"../admin/plugins/meilisearch.js": "./static/lib/admin.js"
 	},
 	"templates": "static/templates"
 }

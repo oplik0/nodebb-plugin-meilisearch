@@ -8,7 +8,7 @@
 	"workspaceFolder": "/workspace",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {},
-	// Eslint extension is here since it integrates with the quickstart config
+	// Eslint extension is here since it integrates with the meilisearch config
 	// MongoDB extension can be a useful alternative to `mongosh` for debugging
 	"extensions": [
 		"dbaeumer.vscode-eslint",

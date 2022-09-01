@@ -1,16 +1,16 @@
 {
-  "name": "nodebb-plugin-quickstart",
+  "name": "nodebb-plugin-meilisearch",
   "version": "0.4.2",
   "description": "A starter kit for quickly creating NodeBB plugins",
   "main": "library.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodebb/nodebb-plugin-quickstart"
+    "url": "https://github.com/nodebb/nodebb-plugin-meilisearch"
   },
   "keywords": [
     "nodebb",
     "plugin",
-    "quickstart",
+    "meilisearch",
     "shell"
   ],
   "husky": {
@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nodebb/nodebb-plugin-quickstart/issues"
+    "url": "https://github.com/nodebb/nodebb-plugin-meilisearch/issues"
   },
   "readmeFilename": "README.md",
   "nbbpm": {
@@ -41,5 +41,8 @@
     "eslint-plugin-import": "2.26.0",
     "husky": "8.0.1",
     "lint-staged": "13.0.3"
+  },
+  "dependencies": {
+    "meilisearch": "^0.27.0"
   }
 }
