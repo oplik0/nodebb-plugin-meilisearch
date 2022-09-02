@@ -5,7 +5,7 @@
   "main": "library.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodebb/nodebb-plugin-meilisearch"
+    "url": "https://github.com/oplik0/nodebb-plugin-meilisearch"
   },
   "keywords": [
     "nodebb",
@@ -19,6 +19,10 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
+  "author": {
+    "name": "oplik0",
+    "url": "https://github.com/oplik0"
+  },
   "lint-staged": {
     "*.js": [
       "eslint --fix",
@@ -27,7 +31,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nodebb/nodebb-plugin-meilisearch/issues"
+    "url": "https://github.com/oplik0/nodebb-plugin-meilisearch/issues"
   },
   "readmeFilename": "README.md",
   "nbbpm": {
