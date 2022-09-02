@@ -1,6 +1,6 @@
 {
 	"id": "nodebb-plugin-meilisearch",
-	"url": "https://github.com/NodeBB/nodebb-plugin-meilisearch",
+	"url": "https://github.com/oplik0/nodebb-plugin-meilisearch",
 	"library": "./library.js",
 	"hooks": [
 		{
