@@ -115,7 +115,6 @@ plugin.getNotices = async function(notices) {
 };
 
 plugin.reIndex = async function () {
-	
 	await Promise.all([
 		batch.processSortedSet('topics:tid', async (tids) => {
 			const topics = await Topics.getTopicsFields(tids, ['tid', 'cid', 'uid', 'pid', 'title', 'timestamp']);
@@ -201,11 +200,18 @@ plugin.search = async function (data) {
 	if (data.matchWords === 'all' && !(data.content?.startsWith('"') && data.content?.endsWith('"'))) {
 		data.content = `"${data.content}"`;
 	}
+	const searchData = data?.searchData;
 	const result = await plugin.client.index(data.index).search(data.content, {
 		attributesToRetrieve: ['id'],
 		limit: await plugin.settings.maxDocuments ?? 500,
-		filter: plugin.buildFilter(data.categories, data.postedBy, data.timeFilter, data.timeRange, data.tid),
-		sort: [plugin.buildSort(data.sortBy, data.sortDirection)],
+		filter: plugin.buildFilter(
+			data.cid,
+			data.uid,
+			searchData?.timeFilter,
+			searchData?.timeRange,
+			searchData?.tid
+		),
+		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
 	});
 	data.ids = result.hits.map(hit => hit.id);
 	return data;
@@ -236,7 +242,7 @@ plugin.buildFilter = function (categories, postedBy, timeFilter, timeRange, tid)
 		filter += ` AND tid = ${tid}`;
 	}
 	filter = filter.trimEnd();
-	return filter;
+	return filter.length ? filter : undefined;
 };
 
 plugin.buildSort = function (sortBy, sortDirection) {
@@ -254,7 +260,7 @@ plugin.buildSort = function (sortBy, sortDirection) {
 		default:
 			return undefined;
 	}
-	return `${field}:${sortDirection === 'ascending' ? 'asc' : 'desc'}`;
+	return [`${field}:${sortDirection === 'ascending' ? 'asc' : 'desc'}`];
 };
 
 module.exports = plugin;
