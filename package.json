@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-meilisearch",
-  "version": "0.4.2",
+  "version": "0.1.0",
   "description": "A starter kit for quickly creating NodeBB plugins",
   "main": "library.js",
   "repository": {

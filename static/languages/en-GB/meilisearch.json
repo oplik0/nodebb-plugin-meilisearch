@@ -1,0 +1,11 @@
+{
+    "admin.connection": "Connection settings",
+    "admin.host": "Meilisearch URL",
+    "admin.apiKey": "API Key",
+    "admin.search": "Search options",
+    "admin.maxDocuments": "Max number of documents returned",
+    "admin.actions": "Actions",
+    "admin.reindex": "Reindex",
+    "admin.forceReindex": "Force reindex (delete all documents)",
+    "admin.save": "save"
+}

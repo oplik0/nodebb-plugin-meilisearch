@@ -66,6 +66,10 @@
 		{
 			"hook": "filter:topic.search",
 			"method": "search"
+		},
+		{
+			"hook": "action:settings.set",
+			"method": "saveSettings"
 		}
 	],
 	"staticDirs": {
@@ -74,15 +78,11 @@
 	"less": [
 		"static/less/meilisearch.less"
 	],
-	"scripts": [
-		"static/lib/main.js"
-	],
-	"acpScripts": [
-		"static/lib/acp-main.js"
-	],
 	"modules": {
-		"../client/meilisearch.js": "./static/lib/meilisearch.js",
 		"../admin/plugins/meilisearch.js": "./static/lib/admin.js"
 	},
-	"templates": "static/templates"
+	"templates": "static/templates",
+	"settingsRoute": "/admin/plugins/meilisearch",
+	"languages": "static/languages",
+	"defaultLang": "en-GB"
 }
