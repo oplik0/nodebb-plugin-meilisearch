@@ -30,11 +30,10 @@ plugin.defaults = {
 		{ rule: 'exactness' },
 	],
 	stopWords: [],
-	typoTolerance: true,
+	typoTolerance: 'on',
 	typoToleranceMinWordSizeOneTypo: 5,
 	typoToleranceMinWordSizeTwoTypos: 9,
 	typoToleranceDisableOnWords: [],
-	typoToleranceDisableOnAttributes: [],
 };
 
 plugin.breakingSettings = [
@@ -124,33 +123,62 @@ plugin.getNotices = async function (notices) {
 plugin.updateIndexSettings = async (data) => {
 	await plugin.client.createIndex('post', { primaryKey: 'pid' });
 	await plugin.client.createIndex('topic', { primaryKey: 'tid' });
+	data = {
+		maxDocuments: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
+		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules'))?.map(value => value.rule),
+		stopWords: (data?.stopWords || await settings.getOne(plugin.id, 'stopWords'))?.map(value => value.word),
+		typoTolerance: ['on', true].includes(
+			data?.typoTolerance || await settings.getOne(plugin.id, 'typoTolerance') || undefined,
+		),
+		typoToleranceMinWordSizeOneTypo: parseInt(
+			data?.typoToleranceMinWordSizeOneTypo ||
+				await settings.getOne(plugin.id, 'typoToleranceMinWordSizeOneTypo') || 5,
+			10,
+		),
+		typoToleranceMinWordSizeTwoTypos: parseInt(
+			data?.typoToleranceMinWordSizeTwoTypos ||
+				await settings.getOne(plugin.id, 'typoToleranceMinWordSizeTwoTypos') || 9,
+			10,
+		),
+		typoToleranceDisableOnWords:
+			(data?.typoToleranceDisableOnWords || await settings.getOne(plugin.id, 'typoToleranceDisableOnWords') ||
+				undefined)?.map(value => value.word),
+	};
 	await plugin.client.index('post').updateSettings({
 		filterableAttributes: ['tid', 'cid', 'uid', 'timestamp'],
 		sortableAttributes: ['timestamp', 'cid'],
 		searchableAttributes: ['content'],
 		pagination: {
-			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
+			maxTotalHits: data.maxDocuments,
 		},
-		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined)?.map(
-			value => value.rule,
-		),
-		stopWords: (data?.stopWords || await settings.getOne(plugin.id, 'stopWords') || undefined)?.map(
-			value => value.word,
-		),
+		rankingRules: data.rankingRules,
+		stopWords: data.stopWords,
+		typoTolerance: {
+			enabled: data.typoTolerance,
+			minWordSizeForTypos: {
+				oneTypo: data.typoToleranceMinWordSizeOneTypo,
+				twoTypos: data.typoToleranceMinWordSizeTwoTypos,
+			},
+			disableOnWords: data.typoToleranceDisableOnWords,
+		},
 	});
 	await plugin.client.index('topic').updateSettings({
 		filterableAttributes: ['cid', 'uid', 'timestamp'],
 		sortableAttributes: ['cid', 'title', 'timestamp'],
 		searchableAttributes: ['title'],
 		pagination: {
-			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
+			maxTotalHits: data.maxDocuments,
 		},
-		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined)?.map(
-			rule => rule.rule,
-		),
-		stopWords: (data?.stopWords || await settings.getOne(plugin.id, 'stopWords') || undefined)?.map(
-			value => value.word,
-		),
+		rankingRules: data.rankingRules,
+		stopWords: data.stopWords,
+		typoTolerance: {
+			enabled: data.typoTolerance,
+			minWordSizeForTypos: {
+				oneTypo: data.typoToleranceMinWordSizeOneTypo,
+				twoTypos: data.typoToleranceMinWordSizeTwoTypos,
+			},
+			disableOnWords: data.typoToleranceDisableOnWords,
+		},
 	});
 };
 

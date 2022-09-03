@@ -36,6 +36,31 @@
 			</div>
 		</div>
 	</div>
+	<div class="row">
+		<div class="col-sm-2 col-xs-12 settings-header">[[meilisearch:admin.typoTolerance]]</div>
+		<div class="col-sm-10 col-xs-12">
+			<div class="checkbox" id="reindex-force-container">
+				<label for="typoTolerance" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+					<input type="checkbox" class="mdl-switch__input" id="typoTolerance" name="typoTolerance">
+					<span class="mdl-switch__label"><strong>[[meilisearch:admin.typoToleranceEnable]]</strong></span>
+				</label>
+			</div>
+			<div class="form-group">
+				<label for="typoToleranceMinWordSizeOneTypo">[[meilisearch:admin.typoToleranceMinWordSizeOneTypo]]</label>
+				<input type="number" id="typoToleranceMinWordSizeOneTypo" name="typoToleranceMinWordSizeOneTypo" title="Typo Tolerance Min Word Size One Typo" class="form-control" placeholder="5">
+			</div>
+			<div class="form-group">
+				<label for="typoToleranceMinWordSizeTwoTypos">[[meilisearch:admin.typoToleranceMinWordSizeTwoTypos]]</label>
+				<input type="number" id="typoToleranceMinWordSizeTwoTypos" name="typoToleranceMinWordSizeTwoTypos" title="Typo Tolerance Min Word Size Two Typos" class="form-control" placeholder="9">
+			</div>
+			<div class="form-group" data-type="sorted-list" data-sorted-list="typoToleranceDisableOnWords" data-item-template="admin/plugins/meilisearch/partials/typoToleranceDisableOnWords/item" data-form-template="admin/plugins/meilisearch/partials/typoToleranceDisableOnWords/form">
+				<label for="stopWordsList">[[meilisearch:admin.typoToleranceDisableOnWords]]</label>
+				<p class="help-block">[[meilisearch:admin.typoToleranceDisableOnWordsHelp]] <a href="https://docs.meilisearch.com/learn/configuration/typo_tolerance.html#disableonwords">https://docs.meilisearch.com/learn/configuration/typo_tolerance.html#disableonwords</a></p>
+				<ul name="stopWordsList" data-type="list" class="list-group"></ul>
+				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addTypoToleranceDisabledWord]]</button>
+			</div>
+		</div>
+	</div>
 	
 </form>
 <div class="row">
