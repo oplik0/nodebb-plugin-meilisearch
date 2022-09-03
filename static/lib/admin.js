@@ -6,31 +6,33 @@
 	It is not bundled into the min file that is served on the first load of the page.
 */
 define('admin/plugins/meilisearch', [
-	'settings', 'api', 'alerts',
+	'settings',
+	'api',
+	'alerts',
 ], (settings, api, alerts) => {
 	const ACP = {};
 
-	ACP.init = function () {
+	ACP.init = function() {
 		settings.load('meilisearch', $('.meilisearch-settings'), () => {
 		});
 		$('#save').on('click', saveSettings);
 		$('#reindex').on('click', reindex);
 	};
 
-	function saveSettings() {
+	function saveSettings () {
 		settings.save('meilisearch', $('.meilisearch-settings'), () => {
 			alerts.alert({
 				type: 'success',
 				alert_id: 'meilisearch-saved',
 				title: 'Settings Saved',
 				message: 'Your settings have been saved successfully.',
-				clickfn: function () {
+				clickfn: function() {
 					socket.emit('admin.reload');
 				},
 			});
 		});
 	}
-	function reindex() {
+	function reindex () {
 		const forceReindex = document.getElementById('force-reindex').checked;
 		api.get(`/plugins/meilisearch/reindex${forceReindex ? '/force' : ''}`);
 	}

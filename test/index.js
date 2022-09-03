@@ -34,7 +34,7 @@ describe('nodebb-plugin-meilisearch', () => {
 		done();
 	});
 
-	it('should load config object', async () => {	// Tests can be async functions too
+	it('should load config object', async () => { // Tests can be async functions too
 		const config = await db.getObject('config');
 		assert(config);
 	});

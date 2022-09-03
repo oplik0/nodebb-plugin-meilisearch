@@ -1,52 +1,53 @@
 {
-  "name": "nodebb-plugin-meilisearch",
-  "version": "0.1.0",
-  "description": "A starter kit for quickly creating NodeBB plugins",
-  "main": "library.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/oplik0/nodebb-plugin-meilisearch"
-  },
-  "keywords": [
-    "nodebb",
-    "plugin",
-    "meilisearch",
-    "shell"
-  ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "author": {
-    "name": "oplik0",
-    "url": "https://github.com/oplik0"
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/oplik0/nodebb-plugin-meilisearch/issues"
-  },
-  "readmeFilename": "README.md",
-  "nbbpm": {
-    "compatibility": "^1.15.0"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "17.1.2",
-    "@commitlint/config-angular": "17.1.0",
-    "eslint": "8.23.0",
-    "eslint-config-nodebb": "0.1.1",
-    "eslint-plugin-import": "2.26.0",
-    "husky": "8.0.1",
-    "lint-staged": "13.0.3"
-  },
-  "dependencies": {
-    "meilisearch": "^0.27.0"
-  }
+	"name": "nodebb-plugin-meilisearch",
+	"version": "0.1.0",
+	"description": "A starter kit for quickly creating NodeBB plugins",
+	"main": "library.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/oplik0/nodebb-plugin-meilisearch"
+	},
+	"keywords": [
+		"nodebb",
+		"plugin",
+		"meilisearch",
+		"shell"
+	],
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged",
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+		}
+	},
+	"author": {
+		"name": "oplik0",
+		"url": "https://github.com/oplik0"
+	},
+	"lint-staged": {
+		"*.js": [
+			"eslint --fix",
+			"git add"
+		]
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/oplik0/nodebb-plugin-meilisearch/issues"
+	},
+	"readmeFilename": "README.md",
+	"nbbpm": {
+		"compatibility": "^1.15.0"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "17.1.2",
+		"@commitlint/config-angular": "17.1.0",
+		"dprint": "^0.31.1",
+		"eslint": "8.23.0",
+		"eslint-config-nodebb": "0.1.1",
+		"eslint-plugin-import": "2.26.0",
+		"husky": "8.0.1",
+		"lint-staged": "13.0.3"
+	},
+	"dependencies": {
+		"meilisearch": "^0.27.0"
+	}
 }

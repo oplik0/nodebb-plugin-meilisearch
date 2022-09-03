@@ -12,6 +12,8 @@ const batch = require.main.require('./src/batch');
 
 const plugin = {};
 
+plugin.id = 'meilisearch';
+
 /** @type MeiliSearch */
 plugin.client = undefined;
 plugin.defaults = {
@@ -19,39 +21,40 @@ plugin.defaults = {
 	apiKey: undefined,
 	maxDocuments: undefined,
 	indexed: false,
+	rankingRules: [
+		'words',
+		'typo',
+		'proximity',
+		'attribute',
+		'sort',
+		'exactness',
+	],
+	stopWords: [],
+	typoTolerance: true,
+	typoToleranceMinWordSizeOneTypo: 5,
+	typoToleranceMinWordSizeTwoTypos: 9,
+	typoToleranceDisableOnWords: [],
+	typoToleranceDisableOnAttributes: [],
 };
+
+plugin.breakingSettings = ['maxDocuments', 'rankingRules'];
 
 plugin.init = async function (params) {
 	const { router /* , middleware , controllers */ } = params;
 	winston.debug('[plugin/meilisearch] Initializing MeiliSearch plugin');
 	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], controllers.renderAdminPage);
-	plugin.settings = new Proxy(settings, {
-		async get(target, prop) {
-			return await target.getOne('meilisearch', prop) || plugin.defaults[prop];
-		},
-		set(target, prop, value) {
-			const data = {};
-			data[prop] = value;
-			return target.set('meilisearch', data, true);
-		},
-		async has(target, prop) {
-			return await target.get(target, prop) !== undefined;
-		},
-		async ownKeys(target) {
-			return Object.keys(await target.get('meilisearch'));
-		},
-	});
+	await settings.setOnEmpty(plugin.id, plugin.defaults);
 	await plugin.prepareSearch();
 };
 
-plugin.prepareSearch = async function () {
-	winston.debug(`[plugin/meilisearch] MeiliSearch host: ${await plugin.settings.host}`);
-
+plugin.prepareSearch = async function (data) {
+	winston.debug(`[plugin/meilisearch] Connecting to MeiliSearch host: ${await settings.getOne(plugin.id, 'host')}`);
 	plugin.client = new MeiliSearch({
-		host: await plugin.settings.host,
-		apiKey: await plugin.settings.apiKey || undefined,
+		host: data?.host || await settings.getOne(plugin.id, 'host'),
+		apiKey: data?.apiKey || await settings.getOne(plugin.id, 'apiKey') || undefined,
 	});
-	if (!await plugin.settings.indexed) {
+	if (!await settings.getOne(plugin.id, 'indexed')) {
+		await plugin.updateIndexSettings();
 		await plugin.reindex(false);
 	}
 };
@@ -63,17 +66,17 @@ plugin.addRoutes = async function ({ router, middleware, helpers }) {
 	];
 
 	routeHelpers.setupApiRoute(router, 'get', '/meilisearch/reindex', middlewares, async (req, res) => {
-		plugin.settings.indexed = false;
+		await settings.set(plugin.id, { indexed: false }, true);
 		await plugin.reindex(false);
 		helpers.formatApiResponse(200, res, {
-			indexed: await plugin.settings.indexed,
+			indexed: await settings.getOne(plugin.id, 'indexed'),
 		});
 	});
 	routeHelpers.setupApiRoute(router, 'get', '/meilisearch/reindex/force', middlewares, async (req, res) => {
-		plugin.settings.indexed = false;
+		await settings.set(plugin.id, { indexed: false }, true);
 		await plugin.reindex(true);
 		helpers.formatApiResponse(200, res, {
-			indexed: await plugin.settings.indexed,
+			indexed: await settings.getOne(plugin.id, 'indexed'),
 		});
 	});
 };
@@ -107,69 +110,75 @@ plugin.getNotices = async function (notices) {
 	return notices;
 };
 
-plugin.updateIndexSettings = async () => {
+plugin.updateIndexSettings = async (data) => {
+	await plugin.client.createIndex('post', { primaryKey: 'pid' });
+	await plugin.client.createIndex('topic', { primaryKey: 'tid' });
 	await plugin.client.index('post').updateSettings({
 		filterableAttributes: ['tid', 'cid', 'uid', 'timestamp'],
 		sortableAttributes: ['timestamp', 'cid'],
 		searchableAttributes: ['content'],
 		pagination: {
-			maxTotalHits: parseInt(await plugin.settings.maxDocuments || 500, 10),
+			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		},
-		rankingRules: await plugin.settings.rankingRules || undefined,
+		rankingRules: data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined,
 	});
 	await plugin.client.index('topic').updateSettings({
 		filterableAttributes: ['cid', 'uid', 'timestamp'],
 		sortableAttributes: ['cid', 'title', 'timestamp'],
 		searchableAttributes: ['title'],
 		pagination: {
-			maxTotalHits: parseInt(await plugin.settings.maxDocuments || 500, 10),
+			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		},
-		rankingRules: await plugin.settings.rankingRules || undefined,
+		rankingRules: data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined,
 	});
-}
+};
 
 plugin.reindex = async function (force = false) {
-	winston.info('[plugin/meilisearch] Reindexing posts and topics');
+	winston.info(`[plugin/meilisearch] Reindexing posts and topics${force ? ' (forced)' : ''}`);
 	if (force) {
 		await plugin.client.index('post').deleteAllDocuments();
 		await plugin.client.index('topic').deleteAllDocuments();
 	}
-	await plugin.updateIndexSettings();
 	await Promise.all([
 		batch.processSortedSet(
 			'topics:tid',
 			async (tids) => {
-				const topics = await Topics.getTopicsFields(tids, ['tid', 'cid', 'uid', 'pid', 'title', 'timestamp']);
-				await plugin.client.index('topic').updateDocuments(topics.map(topic => ({
-					id: topic.tid,
-					cid: topic.cid,
-					uid: topic.uid,
-					mainPid: topic.pid,
-					title: topic.title,
-					timestamp: topic.timestamp,
-				})));
+				const topics = await Topics.getTopicsFields(tids, ['tid', 'cid', 'uid', 'mainPid', 'title', 'timestamp']);
+				await plugin.client.index('topic').updateDocuments(
+					topics.map(topic => ({
+						tid: topic.tid,
+						cid: topic.cid,
+						uid: topic.uid,
+						mainPid: topic.mainPid,
+						title: topic.title,
+						timestamp: topic.timestamp,
+					})),
+					{ primaryKey: 'tid' },
+				);
 			},
-			{ batch: 500 },
+			{ batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10) },
 		),
 		batch.processSortedSet(
 			'posts:pid',
 			async (pids) => {
 				const posts = await Posts.getPostsFields(pids, ['pid', 'tid', 'cid', 'uid', 'content', 'timestamp']);
-				await plugin.client.index('post').updateDocuments(posts.map(post => ({
-					id: post.pid,
-					tid: post.tid,
-					cid: post.cid,
-					uid: post.uid,
-					content: post.content,
-					timestamp: post.timestamp,
-				})));
+				await plugin.client.index('post').updateDocuments(
+					posts.map(post => ({
+						pid: post.pid,
+						tid: post.tid,
+						cid: post.cid,
+						uid: post.uid,
+						content: post.content,
+						timestamp: post.timestamp,
+					})),
+					{ primaryKey: 'pid' },
+				);
 			},
-			{ batch: 500 },
+			{ batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10) },
 		),
 	]);
-	plugin.settings.indexed = true;
+	await settings.set(plugin.id, { indexed: true }, true);
 };
-
 
 plugin.indexPost = async function ({ post }) {
 	if (!post.cid) {
@@ -177,14 +186,14 @@ plugin.indexPost = async function ({ post }) {
 	}
 	await plugin.client.index('post').updateDocuments([
 		{
-			id: post.pid,
+			pid: post.pid,
 			tid: post.tid,
 			cid: post.cid,
 			uid: post.uid,
 			content: post.content,
 			timestamp: post.timestamp,
 		},
-	]);
+	], { primaryKey: 'pid' });
 };
 
 plugin.deindexPost = async function ({ post }) {
@@ -193,13 +202,13 @@ plugin.deindexPost = async function ({ post }) {
 
 plugin.indexTopic = async function ({ topic }) {
 	await plugin.client.index('topic').updateDocuments([{
-		id: topic.tid,
+		tid: topic.tid,
 		cid: topic.cid,
 		uid: topic.uid,
-		mainPid: topic.pid,
+		mainPid: topic.mainPid,
 		title: topic.title,
 		timestamp: topic.timestamp,
-	}]);
+	}], { primaryKey: 'tid' });
 };
 
 plugin.deindexTopic = async function ({ topic }) {
@@ -214,11 +223,15 @@ plugin.checkConflict = function () {
 plugin.search = async function (data) {
 	if (plugin.checkConflict()) {
 		// The dbsearch plugin was detected, abort search!
-		winston.warn('[plugin/meilisearch] Another search plugin (dbsearch) is enabled, so search via Meilisearch was aborted.');
+		winston.warn(
+			'[plugin/meilisearch] Another search plugin (dbsearch) is enabled, so search via Meilisearch was aborted.',
+		);
 		return data;
 	}
 	if (!await plugin.isHealthy()) {
-		winston.warn('[plugin/meilisearch] Meilisearch instance did not return a healthy response, so search via Meilisearch was aborted.');
+		winston.warn(
+			'[plugin/meilisearch] Meilisearch instance did not return a healthy response, so search via Meilisearch was aborted.',
+		);
 		return data;
 	}
 	if (data.term) {
@@ -231,13 +244,13 @@ plugin.search = async function (data) {
 	const searchData = data?.searchData;
 	const result = await plugin.client.index(data.index).search(data.content, {
 		attributesToRetrieve: ['id'],
-		limit: parseInt(await plugin.settings.maxDocuments || 500, 10),
+		limit: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		filter: plugin.buildFilter(
 			data.cid,
 			data.uid,
 			searchData?.timeFilter,
 			searchData?.timeRange,
-			searchData?.tid
+			searchData?.tid,
 		),
 		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
 	});
@@ -292,11 +305,24 @@ plugin.buildSort = function (sortBy, sortDirection) {
 };
 
 plugin.saveSettings = async (data) => {
-	if (data.plugin !== plugin.id || data.silent) return data;
-	await plugin.prepareSearch();
-	if (data.settings?.maxDocuments !== await plugin.settings.maxDocuments) {
-		await plugin.updateIndexSettings();
+	if (data.plugin === plugin.id && !data.quiet) {
+		try {
+			await plugin.prepareSearch(data.settings);
+			if (
+				Object.entries(data.settings).filter(isBreaking).length
+			) {
+				await plugin.updateIndexSettings();
+			}
+		} catch (err) {
+			winston.error(`[plugin/meilisearch] Error while saving settings: ${err.message}`);
+		}
 	}
+	return data;
 };
+
+async function isBreaking([setting, value]) {
+	return plugin.breakingSettings.includes(setting) &&
+		value !== await settings.getOne(plugin.id, setting);
+}
 
 module.exports = plugin;

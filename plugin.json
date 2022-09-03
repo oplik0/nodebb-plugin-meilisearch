@@ -68,7 +68,7 @@
 			"method": "search"
 		},
 		{
-			"hook": "action:settings.set",
+			"hook": "filter:settings.set",
 			"method": "saveSettings"
 		}
 	],

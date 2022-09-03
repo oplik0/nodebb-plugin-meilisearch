@@ -1,11 +1,11 @@
 {
-    "admin.connection": "Ustawienia połączenia",
-    "admin.host": "Meilisearch URL",
-    "admin.apiKey": "Klucz API",
-    "admin.search": "Ustawienia wyszukiwania",
-    "admin.maxDocuments": "Maksymalna liczba zwracanych dokumentów",
-    "admin.actions": "Akcje",
-    "admin.reindex": "Ponownie indeksuj",
-    "admin.forceReindex": "Wymuś indeksowanie (usuń wszystkie dokumenty)",
-    "admin.save": "zapisz"
+	"admin.connection": "Ustawienia połączenia",
+	"admin.host": "Meilisearch URL",
+	"admin.apiKey": "Klucz API",
+	"admin.search": "Ustawienia wyszukiwania",
+	"admin.maxDocuments": "Maksymalna liczba zwracanych dokumentów",
+	"admin.actions": "Akcje",
+	"admin.reindex": "Ponownie indeksuj",
+	"admin.forceReindex": "Wymuś indeksowanie (usuń wszystkie dokumenty)",
+	"admin.save": "zapisz"
 }
