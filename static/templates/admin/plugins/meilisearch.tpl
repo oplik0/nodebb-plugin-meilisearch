@@ -22,6 +22,11 @@
 				<label for="maxDocuments">[[meilisearch:admin.maxDocuments]]</label>
 				<input type="number" id="maxDocuments" name="maxDocuments" title="Max Documents" class="form-control" placeholder="500">
 			</div>
+			<div class="form-group" data-type="sorted-list" data-sorted-list="rankingRules" data-item-template="admin/plugins/meilisearch/partials/rankingRules/item" data-form-template="admin/plugins/meilisearch/partials/rankingRules/form">
+				<label for="rankingRulesList">[[meilisearch:admin.rankingRules]]</label>
+				<ul name="rankingRulesList" data-type="list" class="list-group"></ul>
+				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addRule]]</button>
+			</div>
 		</div>
 	</div>
 	

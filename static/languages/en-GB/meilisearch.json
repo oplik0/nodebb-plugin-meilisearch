@@ -4,8 +4,14 @@
 	"admin.apiKey": "API Key",
 	"admin.search": "Search options",
 	"admin.maxDocuments": "Max number of documents returned",
+	"admin.rankingRules": "Ranking rules",
+	"admin.rankingRulesFormLabel": "Rule",
+	"admin.rankingRulesFormHelp": "Use the following syntax for custom rules: 'attribute:asc' or 'attribute:desc'. For more information read the documentation here:",
+	"admin.addRule": "Add a ranking rule",
 	"admin.actions": "Actions",
 	"admin.reindex": "Reindex",
 	"admin.forceReindex": "Force reindex (delete all documents)",
-	"admin.save": "save"
+	"admin.save": "save",
+	"admin.edit": "edit",
+	"admin.delete": "delete"
 }

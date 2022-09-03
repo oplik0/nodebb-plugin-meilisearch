@@ -22,12 +22,12 @@ plugin.defaults = {
 	maxDocuments: undefined,
 	indexed: false,
 	rankingRules: [
-		'words',
-		'typo',
-		'proximity',
-		'attribute',
-		'sort',
-		'exactness',
+		{ rule: 'words' },
+		{ rule: 'typo' },
+		{ rule: 'proximity' },
+		{ rule: 'attribute' },
+		{ rule: 'sort' },
+		{ rule: 'exactness' },
 	],
 	stopWords: [],
 	typoTolerance: true,
@@ -37,7 +37,17 @@ plugin.defaults = {
 	typoToleranceDisableOnAttributes: [],
 };
 
-plugin.breakingSettings = ['maxDocuments', 'rankingRules'];
+plugin.breakingSettings = [
+	'maxDocuments',
+	'rankingRules',
+	'stopWords',
+	'typoTolerance',
+	'typoToleranceMinWordSizeOneTypo',
+	'typoToleranceMinWordSizeTwoTypos',
+	'typoToleranceDisableOnWords',
+	'typoToleranceDisableOnAttributes',
+];
+plugin.initialized = false;
 
 plugin.init = async function (params) {
 	const { router /* , middleware , controllers */ } = params;
@@ -45,6 +55,7 @@ plugin.init = async function (params) {
 	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], controllers.renderAdminPage);
 	await settings.setOnEmpty(plugin.id, plugin.defaults);
 	await plugin.prepareSearch();
+	plugin.initialized = true;
 };
 
 plugin.prepareSearch = async function (data) {
@@ -120,7 +131,9 @@ plugin.updateIndexSettings = async (data) => {
 		pagination: {
 			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		},
-		rankingRules: data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined,
+		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined)?.map(
+			rule => rule.rule,
+		),
 	});
 	await plugin.client.index('topic').updateSettings({
 		filterableAttributes: ['cid', 'uid', 'timestamp'],
@@ -129,7 +142,9 @@ plugin.updateIndexSettings = async (data) => {
 		pagination: {
 			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		},
-		rankingRules: data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined,
+		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined)?.map(
+			rule => rule.rule,
+		),
 	});
 };
 
@@ -305,13 +320,14 @@ plugin.buildSort = function (sortBy, sortDirection) {
 };
 
 plugin.saveSettings = async (data) => {
-	if (data.plugin === plugin.id && !data.quiet) {
+	if (data.plugin === plugin.id && !data.quiet && plugin.initialized) {
 		try {
 			await plugin.prepareSearch(data.settings);
 			if (
-				Object.entries(data.settings).filter(isBreaking).length
+				Object.entries(data.settings).some(isBreaking)
 			) {
-				await plugin.updateIndexSettings();
+				winston.info(`settings changed, updating index`);
+				await plugin.updateIndexSettings(data.settings);
 			}
 		} catch (err) {
 			winston.error(`[plugin/meilisearch] Error while saving settings: ${err.message}`);
@@ -321,8 +337,21 @@ plugin.saveSettings = async (data) => {
 };
 
 async function isBreaking([setting, value]) {
-	return plugin.breakingSettings.includes(setting) &&
-		value !== await settings.getOne(plugin.id, setting);
+	winston.info(`[plugin/meilisearch] Checking if ${setting} with value ${JSON.stringify(value)} is breaking`);
+	return plugin.breakingSettings.includes(setting) && !deepCompare(await settings.getOne(plugin.id, setting), value);
 }
 
+function deepCompare(a, b) {
+	if (typeof a !== typeof b) return false;
+	switch (typeof a) {
+		case 'object':
+			return Object.keys(a).length === Object.keys(b).length &&
+				Object.keys(a).every(key => deepCompare(a[key], b[key]));
+		case 'string':
+		case 'number':
+		case 'boolean':
+		default:
+			return a === b;
+	}
+}
 module.exports = plugin;
