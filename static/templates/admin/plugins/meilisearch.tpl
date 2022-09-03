@@ -24,8 +24,15 @@
 			</div>
 			<div class="form-group" data-type="sorted-list" data-sorted-list="rankingRules" data-item-template="admin/plugins/meilisearch/partials/rankingRules/item" data-form-template="admin/plugins/meilisearch/partials/rankingRules/form">
 				<label for="rankingRulesList">[[meilisearch:admin.rankingRules]]</label>
+				<p class="help-block">[[meilisearch:admin.rankingRulesHelp]] <a href="https://docs.meilisearch.com/learn/core_concepts/relevancy.html#ranking-rules">https://docs.meilisearch.com/learn/core_concepts/relevancy.html#ranking-rules</a></p>
 				<ul name="rankingRulesList" data-type="list" class="list-group"></ul>
-				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addRule]]</button>
+				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addRankingRule]]</button>
+			</div>
+			<div class="form-group" data-type="sorted-list" data-sorted-list="stopWords" data-item-template="admin/plugins/meilisearch/partials/stopWords/item" data-form-template="admin/plugins/meilisearch/partials/stopWords/form">
+				<label for="stopWordsList">[[meilisearch:admin.stopWords]]</label>
+				<p class="help-block">[[meilisearch:admin.stopWordsHelp]] <a href="https://docs.meilisearch.com/reference/api/settings.html#get-stop-words">https://docs.meilisearch.com/reference/api/settings.html#get-stop-words</a></p>
+				<ul name="stopWordsList" data-type="list" class="list-group"></ul>
+				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addStopWord]]</button>
 			</div>
 		</div>
 	</div>

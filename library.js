@@ -132,7 +132,10 @@ plugin.updateIndexSettings = async (data) => {
 			maxTotalHits: parseInt(data?.maxDocuments || await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		},
 		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined)?.map(
-			rule => rule.rule,
+			value => value.rule,
+		),
+		stopWords: (data?.stopWords || await settings.getOne(plugin.id, 'stopWords') || undefined)?.map(
+			value => value.word,
 		),
 	});
 	await plugin.client.index('topic').updateSettings({
@@ -144,6 +147,9 @@ plugin.updateIndexSettings = async (data) => {
 		},
 		rankingRules: (data?.rankingRules || await settings.getOne(plugin.id, 'rankingRules') || undefined)?.map(
 			rule => rule.rule,
+		),
+		stopWords: (data?.stopWords || await settings.getOne(plugin.id, 'stopWords') || undefined)?.map(
+			value => value.word,
 		),
 	});
 };
