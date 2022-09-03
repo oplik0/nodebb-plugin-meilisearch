@@ -224,7 +224,7 @@ plugin.search = async function (data) {
 	if (data.term) {
 		data.content = data.term;
 	}
-	winston.info(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
+	winston.debug(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
 	if (data.matchWords === 'all' && !(data.content?.startsWith('"') && data.content?.endsWith('"'))) {
 		data.content = `"${data.content}"`;
 	}
