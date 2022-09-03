@@ -34,6 +34,12 @@
 				<ul name="stopWordsList" data-type="list" class="list-group"></ul>
 				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addStopWord]]</button>
 			</div>
+			<div class="form-group" data-type="sorted-list" data-sorted-list="synonyms" data-item-template="admin/plugins/meilisearch/partials/synonyms/item" data-form-template="admin/plugins/meilisearch/partials/synonyms/form">
+				<label for="synonymsList">[[meilisearch:admin.synonyms]]</label>
+				<p class="help-block">[[meilisearch:admin.synonymsHelp]] <a href="https://docs.meilisearch.com/learn/configuration/synonyms.html">https://docs.meilisearch.com/learn/configuration/synonyms.html</a></p>
+				<ul name="synonymsList" data-type="list" class="list-group"></ul>
+				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addSynonym]]</button>
+			</div>
 		</div>
 	</div>
 	<div class="row">
@@ -54,9 +60,9 @@
 				<input type="number" id="typoToleranceMinWordSizeTwoTypos" name="typoToleranceMinWordSizeTwoTypos" title="Typo Tolerance Min Word Size Two Typos" class="form-control" placeholder="9">
 			</div>
 			<div class="form-group" data-type="sorted-list" data-sorted-list="typoToleranceDisableOnWords" data-item-template="admin/plugins/meilisearch/partials/typoToleranceDisableOnWords/item" data-form-template="admin/plugins/meilisearch/partials/typoToleranceDisableOnWords/form">
-				<label for="stopWordsList">[[meilisearch:admin.typoToleranceDisableOnWords]]</label>
+				<label for="typoToleranceDisableOnWordsList">[[meilisearch:admin.typoToleranceDisableOnWords]]</label>
 				<p class="help-block">[[meilisearch:admin.typoToleranceDisableOnWordsHelp]] <a href="https://docs.meilisearch.com/learn/configuration/typo_tolerance.html#disableonwords">https://docs.meilisearch.com/learn/configuration/typo_tolerance.html#disableonwords</a></p>
-				<ul name="stopWordsList" data-type="list" class="list-group"></ul>
+				<ul name="typoToleranceDisableOnWordsList" data-type="list" class="list-group"></ul>
 				<button type="button" data-type="add" class="btn btn-info">[[meilisearch:admin.addTypoToleranceDisabledWord]]</button>
 			</div>
 		</div>

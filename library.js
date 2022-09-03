@@ -34,6 +34,7 @@ plugin.defaults = {
 	typoToleranceMinWordSizeOneTypo: 5,
 	typoToleranceMinWordSizeTwoTypos: 9,
 	typoToleranceDisableOnWords: [],
+	synonyms: [],
 };
 
 plugin.breakingSettings = [
@@ -45,6 +46,7 @@ plugin.breakingSettings = [
 	'typoToleranceMinWordSizeTwoTypos',
 	'typoToleranceDisableOnWords',
 	'typoToleranceDisableOnAttributes',
+	'synonyms',
 ];
 plugin.initialized = false;
 
@@ -143,6 +145,11 @@ plugin.updateIndexSettings = async (data) => {
 		typoToleranceDisableOnWords:
 			(data?.typoToleranceDisableOnWords || await settings.getOne(plugin.id, 'typoToleranceDisableOnWords') ||
 				undefined)?.map(value => value.word),
+		synonyms: Object.fromEntries(
+			(data?.synonyms || await settings.getOne(plugin.id, 'synonyms') || [])?.map((
+				{ word, synonyms },
+			) => [word, synonyms?.split(',').map(synonym => synonym.trim())]),
+		),
 	};
 	await plugin.client.index('post').updateSettings({
 		filterableAttributes: ['tid', 'cid', 'uid', 'timestamp'],
@@ -161,6 +168,7 @@ plugin.updateIndexSettings = async (data) => {
 			},
 			disableOnWords: data.typoToleranceDisableOnWords,
 		},
+		synonyms: data.synonyms,
 	});
 	await plugin.client.index('topic').updateSettings({
 		filterableAttributes: ['cid', 'uid', 'timestamp'],
@@ -179,6 +187,7 @@ plugin.updateIndexSettings = async (data) => {
 			},
 			disableOnWords: data.typoToleranceDisableOnWords,
 		},
+		synonyms: data.synonyms,
 	});
 };
 
