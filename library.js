@@ -295,13 +295,14 @@ plugin.search = async function (data) {
 	if (data.term) {
 		data.content = data.term;
 	}
-	winston.debug(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
+	winston.info(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
 	if (data.matchWords === 'all' && !(data.content?.startsWith('"') && data.content?.endsWith('"'))) {
 		data.content = `"${data.content}"`;
 	}
 	const searchData = data?.searchData;
+	const id = data.index === 'post' ? 'pid' : 'tid';
 	const result = await plugin.client.index(data.index).search(data.content, {
-		attributesToRetrieve: ['id'],
+		attributesToRetrieve: [id],
 		limit: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 		filter: plugin.buildFilter(
 			data.cid,
@@ -312,7 +313,8 @@ plugin.search = async function (data) {
 		),
 		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
 	});
-	data.ids = result.hits.map(hit => hit.id);
+	winston.info(`[plugin/meilisearch] ${JSON.stringify(result, null, 2)}`);
+	data.ids = result.hits.map(hit => hit[id]);
 	return data;
 };
 

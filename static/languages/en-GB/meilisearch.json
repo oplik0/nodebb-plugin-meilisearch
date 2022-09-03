@@ -1,4 +1,5 @@
 {
+	"admin.settings": "Meilisearch Settings",
 	"admin.connection": "Connection settings",
 	"admin.host": "Meilisearch URL",
 	"admin.apiKey": "API Key",
@@ -15,7 +16,7 @@
 	"admin.stopWordsFormHelp": "For more information read the documentation here:",
 	"admin.addStopWord": "Add a stop word",
 	"admin.synonyms": "Synonyms",
-	"admin.synonymsHelp": "Words that MeiliSearch should consider as having equivalent meaning in order to make search results more relevant. For more information read the docs here:",
+	"admin.synonymsHelp": "Words that Meilisearch should consider as having equivalent meaning in order to make search results more relevant. For more information read the docs here:",
 	"admin.synonymsWordFormLabel": "Word",
 	"admin.synonymsSynonymsFormLabel": "Synonyms",
 	"admin.synonymsFormHelp": "Add synonyms as a comma separated list (eg. 'word,utterance,phrase')",
@@ -31,6 +32,7 @@
 	"admin.actions": "Actions",
 	"admin.reindex": "Reindex",
 	"admin.forceReindex": "Force reindex (delete all documents)",
+	"admin.reindexHelp": "Index all posts and topics again, in case of a mismatch between Meilisearch and NodeBB. This can take a while depending on the number of posts and topics in your forum.",
 	"admin.save": "save",
 	"admin.edit": "edit",
 	"admin.delete": "delete"

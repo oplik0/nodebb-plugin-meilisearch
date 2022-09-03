@@ -1,4 +1,5 @@
 <form role="form" class="meilisearch-settings">
+	<div class="row"><h2 class="text-center">[[meilisearch:admin.settings]]</h2></div>
 	<div class="row">
 		<div class="col-sm-2 col-xs-12 settings-header">[[meilisearch:admin.connection]]</div>
 		<div class="col-sm-10 col-xs-12">
@@ -69,10 +70,12 @@
 	</div>
 	
 </form>
+<hr />
 <div class="row">
+	<h2 class="text-center">[[meilisearch:admin.actions]]</h2>
 	<div class="col-sm-2 col-xs-12 settings-header">[[meilisearch:admin.actions]]</div>
 	<div class="col-sm-10 col-xs-12">
-
+			<p class="help-block">[[meilisearch:admin.reindexHelp]]</p>
 			<button type="button" id="reindex" class="btn btn-danger btn-sm col-sm-5 col-xs-12">[[meilisearch:admin.reindex]]</button>
 			<div class="checkbox col-sm-5 col-xs-12" id="reindex-force-container">
 				<label for="force-reindex" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
@@ -82,6 +85,7 @@
 			</div>
 	</div>
 </div>
+<hr />
 <button id="save" class="floating-button mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
 	<i class="material-icons">[[meilisearch:admin.save]]</i>
 </button>
