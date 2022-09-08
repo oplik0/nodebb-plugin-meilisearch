@@ -262,6 +262,9 @@ plugin.reindex = async function (force = false) {
 			batch.processSortedSet(
 				'topics:tid',
 				async (tids) => {
+					plugin.indexing.topic_progress.current += tids.length;
+					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+					pubsub.publish('meilisearch:reindex', plugin.indexing);
 					const topics = await Topics.getTopicsFields(tids, ['tid', 'cid', 'uid', 'mainPid', 'title', 'timestamp']);
 					await plugin.client.index('topic').updateDocuments(
 						topics.map(topic => ({
@@ -274,19 +277,18 @@ plugin.reindex = async function (force = false) {
 						})),
 						{ primaryKey: 'tid' },
 					);
-					plugin.indexing.topic_progress.current += tids.length;
-					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
-					pubsub.publish('meilisearch:reindex', plugin.indexing);
 				},
 				{
 					batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 					progress: plugin.indexing.topic_progress,
-					interval: 10,
 				},
 			),
 			batch.processSortedSet(
 				'posts:pid',
 				async (pids) => {
+					plugin.indexing.post_progress.current += pids.length;
+					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+					pubsub.publish('meilisearch:reindex', plugin.indexing);
 					const posts = await Posts.getPostsFields(pids, ['pid', 'tid', 'cid', 'uid', 'content', 'timestamp']);
 					await plugin.client.index('post').updateDocuments(
 						posts.map(post => ({
@@ -299,14 +301,10 @@ plugin.reindex = async function (force = false) {
 						})),
 						{ primaryKey: 'pid' },
 					);
-					plugin.indexing.post_progress.current += pids.length;
-					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
-					pubsub.publish('meilisearch:reindex', plugin.indexing);
 				},
 				{
 					batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
 					progress: plugin.indexing.post_progress,
-					interval: 10,
 				},
 			),
 		]).then(() => {
