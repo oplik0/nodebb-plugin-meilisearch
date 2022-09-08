@@ -238,7 +238,7 @@ plugin.reindex = async function (force = false) {
 			total: 0,
 		},
 	};
-	winston.info(`[plugin/meilisearch] Reindexing posts and topics${force ? ' (forced)' : ''}`);
+	winston.info(`[plugin/meilisearch] Indexing posts and topics${force ? ' (forced)' : ''}`);
 	try {
 		if (force) {
 			await plugin.client.index('post').deleteAllDocuments();
@@ -305,10 +305,10 @@ plugin.reindex = async function (force = false) {
 					current: null,
 				},
 			};
-			winston.info('[plugin/meilisearch] Reindexing complete');
+			winston.info('[plugin/meilisearch] Indexing complete');
 		});
 	} catch (err) {
-		winston.error(`[plugin/meilisearch] Reindexing failed: ${err.message}`);
+		winston.error(`[plugin/meilisearch] Indexing failed: ${err.message}`);
 		plugin.indexing = {
 			running: false,
 			topic_progress: {
