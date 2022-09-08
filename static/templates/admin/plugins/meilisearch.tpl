@@ -51,6 +51,10 @@
 				<label for="apiKey">[[meilisearch:admin.apiKey]]</label>
 				<input type="password" id="apiKey" name="apiKey" title="API Key" class="form-control" placeholder="*****">
 			</div>
+			<div class="form-group">
+				<label for="healthCheckInterval">[[meilisearch:admin.healthCheckInterval]]</label>
+				<input type="number" id="healthCheckInterval" name="healthCheckInterval" title="Health Check Interval" class="form-control" placeholder="60">
+			</div>
 		</div>
 	</div>
 

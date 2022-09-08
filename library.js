@@ -14,6 +14,8 @@ const plugin = {};
 
 plugin.id = 'meilisearch';
 
+plugin.healthy = false;
+
 plugin.indexing = {
 	running: false,
 	topic_progress: {
@@ -47,6 +49,7 @@ plugin.defaults = {
 	typoToleranceMinWordSizeTwoTypos: 9,
 	typoToleranceDisableOnWords: [],
 	synonyms: [],
+	healthCheckInterval: 60,
 };
 
 plugin.breakingSettings = [
@@ -61,6 +64,8 @@ plugin.breakingSettings = [
 	'synonyms',
 ];
 plugin.initialized = false;
+
+plugin.healthCheckTask = null;
 
 plugin.init = async function (params) {
 	const { router /* , middleware , controllers */ } = params;
@@ -85,6 +90,11 @@ plugin.prepareSearch = async function (data) {
 		await plugin.updateIndexSettings();
 		await plugin.reindex(false);
 	}
+	if (plugin.healthCheckTask) clearInterval(plugin.healthCheckTask);
+	plugin.healthCheckTask = setInterval(
+		plugin.checkHealth,
+		parseInt(data?.healthCheckInterval || await settings.getOne(plugin.id, 'healthCheckInterval'), 10) * 1000,
+	);
 };
 
 plugin.addRoutes = async function ({ router, middleware, helpers }) {
@@ -122,19 +132,21 @@ plugin.addAdminNavigation = function (header) {
 	return header;
 };
 
-plugin.isHealthy = async function () {
+plugin.checkHealth = async function () {
 	try {
-		return await plugin.client.isHealthy();
+		plugin.healthy = await plugin.client.isHealthy();
+		return plugin.healthy;
 	} catch (err) {
+		plugin.healthy = false;
 		winston.warn(err);
 		return false;
 	}
 };
 
 plugin.getNotices = async function (notices) {
-	const isHealthy = await plugin.isHealthy();
+	const checkHealth = await plugin.checkHealth();
 	notices.push({
-		done: isHealthy,
+		done: checkHealth,
 		doneText: 'MeiliSearch connection OK',
 		notDoneText: 'Could not connect to MeiliSearch',
 	});
@@ -360,12 +372,13 @@ plugin.search = async function (data) {
 		);
 		return data;
 	}
-	if (!await plugin.isHealthy()) {
+	if (!plugin.healthy && !(await plugin.checkHealth())) {
 		winston.warn(
 			'[plugin/meilisearch] Meilisearch instance did not return a healthy response, so search via Meilisearch was aborted.',
 		);
 		return data;
 	}
+	// topic search uses term instead of content
 	if (data.term) {
 		data.content = data.term;
 	}
