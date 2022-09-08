@@ -84,6 +84,8 @@ plugin.init = async function (params) {
 	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], (req, res) => {
 		res.render('admin/plugins/meilisearch', {
 			indexing: plugin.indexing,
+			topicPercent: Math.round(100 * plugin.indexing.topic_progress.current / plugin.indexing.topic_progress.total),
+			postPercent: Math.round(100 * plugin.indexing.post_progress.current / plugin.indexing.post_progress.total),
 		});
 	});
 	await settings.setOnEmpty(plugin.id, plugin.defaults);

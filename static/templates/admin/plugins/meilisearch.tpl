@@ -18,7 +18,7 @@
 			<div class="col-sm-12 col-xs-12 reindex-progress-container {{{ if !indexing.running}}}hidden{{{end}}}">
 				<h4 class="text-center">[[meilisearch:admin.reindexTopicsProgress]] <span id="topic-reindex-progress-text">{indexing.post_progress.current}/{indexing.post_progress.total}</span></h4>
 				<div class="progress">
-					<div id="topic-reindex-progress" class="progress-bar" role="progressbar" aria-valuenow="{indexing.topic_progress.current}" aria-valuemin="0" aria-valuemax="{indexing.topic_progress.total}">
+					<div id="topic-reindex-progress" class="progress-bar reindex-progress-bar" role="progressbar" aria-valuenow="{indexing.topic_progress.current}" aria-valuemin="0" aria-valuemax="{indexing.topic_progress.total}" style="width: {topicPercent};">
 						{indexing.topic_progress.current}/{indexing.topic_progress.total}
 					</div>
 				</div>
@@ -26,7 +26,7 @@
 			<div class="col-sm-12 col-xs-12 reindex-progress-container {{{ if !indexing.running}}}hidden{{{end}}}">
 				<h4 class="text-center">[[meilisearch:admin.reindexPostsProgress]] <span id="post-reindex-progress-text">{indexing.post_progress.current}/{indexing.post_progress.total}</span></h4>
 				<div class="progress">
-					<div id="post-reindex-progress" class="progress-bar" role="progressbar" aria-valuenow="{indexing.post_progress.current}" aria-valuemin="0" aria-valuemax="{indexing.post_progress.total}">
+					<div id="post-reindex-progress" class="progress-bar reindex-progress-bar" role="progressbar" aria-valuenow="{indexing.post_progress.current}" aria-valuemin="0" aria-valuemax="{indexing.post_progress.total}" style="width: {postPercent};"></div>>
 						{indexing.post_progress.current}/{indexing.post_progress.total}
 					</div>
 				</div>
