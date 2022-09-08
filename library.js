@@ -9,6 +9,7 @@ const Posts = require.main.require('./src/posts');
 const Topics = require.main.require('./src/topics');
 const batch = require.main.require('./src/batch');
 const Sockets = require.main.require('./src/socket.io');
+const pubsub = require.main.require('./src/pubsub');
 
 const plugin = {};
 
@@ -65,7 +66,17 @@ plugin.breakingSettings = [
 ];
 plugin.initialized = false;
 
+plugin.initializingOnAnotherInstance = false;
+
 plugin.healthCheckTask = null;
+
+pubsub.on('meilisearch:indexing', (indexing) => {
+	plugin.indexing = indexing;
+	Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+});
+pubsub.on('meilisearch:init', (initializing) => {
+	plugin.initializingOnAnotherInstance = initializing;
+});
 
 plugin.init = async function (params) {
 	const { router /* , middleware , controllers */ } = params;
@@ -91,7 +102,9 @@ plugin.prepareSearch = async function (data) {
 		plugin.checkHealth,
 		parseInt(data?.healthCheckInterval || await settings.getOne(plugin.id, 'healthCheckInterval'), 10) * 1000,
 	);
-	if (!await settings.getOne(plugin.id, 'indexed') && await plugin.checkHealth()) {
+	if (
+		!await settings.getOne(plugin.id, 'indexed') && await plugin.checkHealth() && !plugin.initializingOnAnotherInstance
+	) {
 		await plugin.updateIndexSettings();
 		await plugin.reindex(false);
 	}
@@ -238,6 +251,7 @@ plugin.reindex = async function (force = false) {
 			total: 0,
 		},
 	};
+	pubsub.publish('meilisearch:reindex', plugin.indexing);
 	winston.info(`[plugin/meilisearch] Indexing posts and topics${force ? ' (forced)' : ''}`);
 	try {
 		if (force) {
@@ -262,6 +276,7 @@ plugin.reindex = async function (force = false) {
 					);
 					plugin.indexing.topic_progress.current += tids.length;
 					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+					pubsub.publish('meilisearch:reindex', plugin.indexing);
 				},
 				{
 					batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
@@ -286,6 +301,7 @@ plugin.reindex = async function (force = false) {
 					);
 					plugin.indexing.post_progress.current += pids.length;
 					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+					pubsub.publish('meilisearch:reindex', plugin.indexing);
 				},
 				{
 					batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
