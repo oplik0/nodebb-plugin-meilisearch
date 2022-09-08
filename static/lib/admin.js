@@ -49,6 +49,11 @@ define('admin/plugins/meilisearch', [
 					type: 'success',
 					timeout: 5000,
 				});
+				setTimeout(() => {
+					progressBarContainers.forEach((container) => {
+						container.classList.add('hidden');
+					});
+				}, 60000);
 			}
 		});
 	};
