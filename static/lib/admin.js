@@ -57,7 +57,7 @@ define('admin/plugins/meilisearch', [
 		element.innerText = `${current}/${total}`;
 		element.setAttribute('aria-valuenow', current);
 		element.setAttribute('aria-valuemax', total);
-		element.style.width = `${Math.round(current / total) * 100}%`;
+		element.style.width = `${Math.round(100 * current / total)}%`;
 	}
 
 	function saveSettings() {
