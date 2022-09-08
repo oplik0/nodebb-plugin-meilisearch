@@ -86,15 +86,15 @@ plugin.prepareSearch = async function (data) {
 		host: data?.host || await settings.getOne(plugin.id, 'host'),
 		apiKey: data?.apiKey || await settings.getOne(plugin.id, 'apiKey') || undefined,
 	});
-	if (!await settings.getOne(plugin.id, 'indexed')) {
-		await plugin.updateIndexSettings();
-		await plugin.reindex(false);
-	}
 	if (plugin.healthCheckTask) clearInterval(plugin.healthCheckTask);
 	plugin.healthCheckTask = setInterval(
 		plugin.checkHealth,
 		parseInt(data?.healthCheckInterval || await settings.getOne(plugin.id, 'healthCheckInterval'), 10) * 1000,
 	);
+	if (!await settings.getOne(plugin.id, 'indexed') && await plugin.checkHealth()) {
+		await plugin.updateIndexSettings();
+		await plugin.reindex(false);
+	}
 };
 
 plugin.addRoutes = async function ({ router, middleware, helpers }) {
