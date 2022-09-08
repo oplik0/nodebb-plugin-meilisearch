@@ -2,17 +2,29 @@
 
 const winston = require.main.require('winston');
 const { MeiliSearch } = require('meilisearch');
-const controllers = require('./lib/controllers');
 
 const routeHelpers = require.main.require('./src/routes/helpers');
 const settings = require.main.require('./src/meta/settings');
 const Posts = require.main.require('./src/posts');
 const Topics = require.main.require('./src/topics');
 const batch = require.main.require('./src/batch');
+const Sockets = require.main.require('./src/socket.io');
 
 const plugin = {};
 
 plugin.id = 'meilisearch';
+
+plugin.indexing = {
+	running: false,
+	topic_progress: {
+		total: null,
+		current: null,
+	},
+	post_progress: {
+		total: null,
+		current: null,
+	},
+};
 
 /** @type MeiliSearch */
 plugin.client = undefined;
@@ -53,7 +65,11 @@ plugin.initialized = false;
 plugin.init = async function (params) {
 	const { router /* , middleware , controllers */ } = params;
 	winston.debug('[plugin/meilisearch] Initializing MeiliSearch plugin');
-	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], controllers.renderAdminPage);
+	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], (req, res) => {
+		res.render('admin/plugins/meilisearch', {
+			indexing: plugin.indexing,
+		});
+	});
 	await settings.setOnEmpty(plugin.id, plugin.defaults);
 	await plugin.prepareSearch();
 	plugin.initialized = true;
@@ -76,15 +92,18 @@ plugin.addRoutes = async function ({ router, middleware, helpers }) {
 		middleware.ensureLoggedIn,
 		middleware.admin.checkPrivileges,
 	];
-
 	routeHelpers.setupApiRoute(router, 'get', '/meilisearch/reindex', middlewares, async (req, res) => {
+		helpers.formatApiResponse(200, res, plugin.indexing);
+	});
+
+	routeHelpers.setupApiRoute(router, 'post', '/meilisearch/reindex', middlewares, async (req, res) => {
 		await settings.set(plugin.id, { indexed: false }, true);
 		await plugin.reindex(false);
 		helpers.formatApiResponse(200, res, {
 			indexed: await settings.getOne(plugin.id, 'indexed'),
 		});
 	});
-	routeHelpers.setupApiRoute(router, 'get', '/meilisearch/reindex/force', middlewares, async (req, res) => {
+	routeHelpers.setupApiRoute(router, 'delete', '/meilisearch/reindex', middlewares, async (req, res) => {
 		await settings.set(plugin.id, { indexed: false }, true);
 		await plugin.reindex(true);
 		helpers.formatApiResponse(200, res, {
@@ -192,49 +211,104 @@ plugin.updateIndexSettings = async (data) => {
 };
 
 plugin.reindex = async function (force = false) {
-	winston.info(`[plugin/meilisearch] Reindexing posts and topics${force ? ' (forced)' : ''}`);
-	if (force) {
-		await plugin.client.index('post').deleteAllDocuments();
-		await plugin.client.index('topic').deleteAllDocuments();
+	if (plugin.indexing.running) {
+		winston.warn('[plugins/meilisearch] Already indexing');
+		return;
 	}
-	await Promise.all([
-		batch.processSortedSet(
-			'topics:tid',
-			async (tids) => {
-				const topics = await Topics.getTopicsFields(tids, ['tid', 'cid', 'uid', 'mainPid', 'title', 'timestamp']);
-				await plugin.client.index('topic').updateDocuments(
-					topics.map(topic => ({
-						tid: topic.tid,
-						cid: topic.cid,
-						uid: topic.uid,
-						mainPid: topic.mainPid,
-						title: topic.title,
-						timestamp: topic.timestamp,
-					})),
-					{ primaryKey: 'tid' },
-				);
+	plugin.indexing = {
+		running: true,
+		topic_progress: {
+			current: 0,
+			total: 0,
+		},
+		post_progress: {
+			current: 0,
+			total: 0,
+		},
+	};
+	winston.info(`[plugin/meilisearch] Reindexing posts and topics${force ? ' (forced)' : ''}`);
+	try {
+		if (force) {
+			await plugin.client.index('post').deleteAllDocuments();
+			await plugin.client.index('topic').deleteAllDocuments();
+		}
+		Promise.all([
+			batch.processSortedSet(
+				'topics:tid',
+				async (tids) => {
+					const topics = await Topics.getTopicsFields(tids, ['tid', 'cid', 'uid', 'mainPid', 'title', 'timestamp']);
+					await plugin.client.index('topic').updateDocuments(
+						topics.map(topic => ({
+							tid: topic.tid,
+							cid: topic.cid,
+							uid: topic.uid,
+							mainPid: topic.mainPid,
+							title: topic.title,
+							timestamp: topic.timestamp,
+						})),
+						{ primaryKey: 'tid' },
+					);
+					plugin.indexing.topic_progress.current += tids.length;
+					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+				},
+				{
+					batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
+					progress: plugin.indexing.topic_progress,
+					interval: 10,
+				},
+			),
+			batch.processSortedSet(
+				'posts:pid',
+				async (pids) => {
+					const posts = await Posts.getPostsFields(pids, ['pid', 'tid', 'cid', 'uid', 'content', 'timestamp']);
+					await plugin.client.index('post').updateDocuments(
+						posts.map(post => ({
+							pid: post.pid,
+							tid: post.tid,
+							cid: post.cid,
+							uid: post.uid,
+							content: post.content,
+							timestamp: post.timestamp,
+						})),
+						{ primaryKey: 'pid' },
+					);
+					plugin.indexing.post_progress.current += pids.length;
+					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
+				},
+				{
+					batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
+					progress: plugin.indexing.post_progress,
+					interval: 10,
+				},
+			),
+		]).then(() => {
+			plugin.indexing = {
+				running: false,
+				topic_progress: {
+					total: null,
+					current: null,
+				},
+				post_progress: {
+					total: null,
+					current: null,
+				},
+			};
+			winston.info('[plugin/meilisearch] Reindexing complete');
+		});
+	} catch (err) {
+		winston.error(`[plugin/meilisearch] Reindexing failed: ${err.message}`);
+		plugin.indexing = {
+			running: false,
+			topic_progress: {
+				total: null,
+				current: null,
 			},
-			{ batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10) },
-		),
-		batch.processSortedSet(
-			'posts:pid',
-			async (pids) => {
-				const posts = await Posts.getPostsFields(pids, ['pid', 'tid', 'cid', 'uid', 'content', 'timestamp']);
-				await plugin.client.index('post').updateDocuments(
-					posts.map(post => ({
-						pid: post.pid,
-						tid: post.tid,
-						cid: post.cid,
-						uid: post.uid,
-						content: post.content,
-						timestamp: post.timestamp,
-					})),
-					{ primaryKey: 'pid' },
-				);
+			post_progress: {
+				total: null,
+				current: null,
 			},
-			{ batch: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10) },
-		),
-	]);
+		};
+	}
 	await settings.set(plugin.id, { indexed: true }, true);
 };
 

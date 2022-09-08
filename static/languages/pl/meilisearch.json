@@ -30,9 +30,13 @@
 	"admin.typoToleranceDisableOnWordsFormLabel": "Słowo nie tolerujące literówek",
 	"admin.addTypoToleranceDisabledWord": "Dodaj słowo nie tolerujące literówek",
 	"admin.actions": "Akcje",
+	"admin.index": "Indeksowanie",
 	"admin.reindex": "Ponownie indeksuj",
 	"admin.forceReindex": "Wymuś indeksowanie (usuń wszystkie dokumenty)",
 	"admin.reindexHelp": "Ponownie indeksuj wszystkie posty i tematy, w wypadku gdyby dane w Meilisearch nie zgadzały się z NodeBB. Ten proces może zająć dłuższy czas w zależności od ilości postów i tematów na forum.",
+	"admin.confirmReindex": "Czy jesteś pewien, że chcesz ponownie indeksować wszystkie posty i tematy?<br>To może zająć trochę czasu",
+	"admin.reindexPostsProgress": "Ponowne indeksowanie postów...",
+	"admin.reindexTopicsProgress": "Ponowne indeksowanie tematów...",
 	"admin.save": "zapisz",
 	"admin.edit": "edytuj",
 	"admin.delete": "usuń"

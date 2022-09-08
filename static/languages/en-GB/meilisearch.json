@@ -30,9 +30,13 @@
 	"admin.typoToleranceDisableOnWordsFormLabel": "Typo-tolerance disabled word",
 	"admin.addTypoToleranceDisabledWord": "Add a typo-tolerance disabled word",
 	"admin.actions": "Actions",
+	"admin.index": "Index",
 	"admin.reindex": "Reindex",
 	"admin.forceReindex": "Force reindex (delete all documents)",
 	"admin.reindexHelp": "Index all posts and topics again, in case of a mismatch between Meilisearch and NodeBB. This can take a while depending on the number of posts and topics in your forum.",
+	"admin.confirmReindex": "Are you sure you want to start reindexing all posts and topics?<br>This operation can take a while.",
+	"admin.reindexPostsProgress": "Reindexing posts...",
+	"admin.reindexTopicsProgress": "Reindexing topics...",
 	"admin.save": "save",
 	"admin.edit": "edit",
 	"admin.delete": "delete"

@@ -1,5 +1,45 @@
+<div class="row">
+	<div class="row">
+		<div class="col-sm-offset-2 col-sm-10 col-xs-12">
+			<h2 class="text-center">[[meilisearch:admin.actions]]</h2>
+		</div>
+	</div>
+	<div class="col-sm-2 col-xs-12 settings-header">[[meilisearch:admin.index]]</div>
+	<div class="col-sm-10 col-xs-12">
+			<p class="help-block">[[meilisearch:admin.reindexHelp]]</p>
+			<button type="button" id="reindex" class="btn btn-danger btn-sm col-sm-5 col-xs-12">[[meilisearch:admin.reindex]]</button>
+			<hr class="visible-xs"/>
+			<div class="checkbox col-sm-5 col-xs-12" id="reindex-force-container">
+				<label for="force-reindex" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+					<input type="checkbox" class="mdl-switch__input" id="force-reindex" name="force-reindex">
+					<span class="mdl-switch__label"><strong>[[meilisearch:admin.forceReindex]]</strong></span>
+				</label>
+			</div>
+			<div class="col-sm-12 col-xs-12 reindex-progress-container {{{ if !indexing.running}}}hidden{{{end}}}">
+				<h4 class="text-center">[[meilisearch:admin.reindexTopicsProgress]] <span id="topic-reindex-progress-text">{indexing.post_progress.current}/{indexing.post_progress.total}</span></h4>
+				<div class="progress">
+					<div id="topic-reindex-progress" class="progress-bar" role="progressbar" aria-valuenow="{indexing.topic_progress.current}" aria-valuemin="0" aria-valuemax="{indexing.topic_progress.total}">
+						{indexing.topic_progress.current}/{indexing.topic_progress.total}
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-12 col-xs-12 reindex-progress-container {{{ if !indexing.running}}}hidden{{{end}}}">
+				<h4 class="text-center">[[meilisearch:admin.reindexPostsProgress]] <span id="post-reindex-progress-text">{indexing.post_progress.current}/{indexing.post_progress.total}</span></h4>
+				<div class="progress">
+					<div id="post-reindex-progress" class="progress-bar" role="progressbar" aria-valuenow="{indexing.post_progress.current}" aria-valuemin="0" aria-valuemax="{indexing.post_progress.total}">
+						{indexing.post_progress.current}/{indexing.post_progress.total}
+					</div>
+				</div>
+			</div>
+	</div>
+</div>
+<hr />
 <form role="form" class="meilisearch-settings">
-	<div class="row"><h2 class="text-center">[[meilisearch:admin.settings]]</h2></div>
+	<div class="row">
+		<div class="col-sm-offset-2 col-sm-10 col-xs-12">
+			<h2 class="text-center">[[meilisearch:admin.settings]]</h2>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-sm-2 col-xs-12 settings-header">[[meilisearch:admin.connection]]</div>
 		<div class="col-sm-10 col-xs-12">
@@ -71,21 +111,7 @@
 	
 </form>
 <hr />
-<div class="row">
-	<h2 class="text-center">[[meilisearch:admin.actions]]</h2>
-	<div class="col-sm-2 col-xs-12 settings-header">[[meilisearch:admin.actions]]</div>
-	<div class="col-sm-10 col-xs-12">
-			<p class="help-block">[[meilisearch:admin.reindexHelp]]</p>
-			<button type="button" id="reindex" class="btn btn-danger btn-sm col-sm-5 col-xs-12">[[meilisearch:admin.reindex]]</button>
-			<div class="checkbox col-sm-5 col-xs-12" id="reindex-force-container">
-				<label for="force-reindex" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-					<input type="checkbox" class="mdl-switch__input" id="force-reindex" name="force-reindex">
-					<span class="mdl-switch__label"><strong>[[meilisearch:admin.forceReindex]]</strong></span>
-				</label>
-			</div>
-	</div>
-</div>
-<hr />
+
 <button id="save" class="floating-button mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
 	<i class="material-icons">[[meilisearch:admin.save]]</i>
 </button>
