@@ -291,12 +291,13 @@ plugin.reindex = async function (force = false) {
 					plugin.indexing.post_progress.current += pids.length;
 					Sockets.server.to('admin/plugins/meilisearch').emit('plugins.meilisearch.reindex', plugin.indexing);
 					pubsub.publish('meilisearch:reindex', plugin.indexing);
-					const posts = await Posts.getPostsFields(pids, ['pid', 'tid', 'cid', 'uid', 'content', 'timestamp']);
+					const posts = await Posts.getPostsFields(pids, ['pid', 'tid', 'uid', 'content', 'timestamp']);
+					const cids = await Posts.getCidsByPids(pids);
 					await plugin.client.index('post').updateDocuments(
-						posts.map(post => ({
+						posts.map((post, index) => ({
 							pid: post.pid,
 							tid: post.tid,
-							cid: post.cid,
+							cid: cids[index],
 							uid: post.uid,
 							content: post.content,
 							timestamp: post.timestamp,
@@ -418,23 +419,19 @@ plugin.search = async function (data) {
 };
 
 plugin.buildFilter = function (categories, postedBy, timeFilter, timeRange, tid) {
-	let filter = '';
+	const filter = [];
 	if (categories?.length) {
-		filter += `(${categories.map(cid => `cid = ${cid}`).join(' OR ')}) `;
+		filter.push(categories.map(cid => `cid = ${cid}`));
 	}
 	if (postedBy?.length) {
-		if (filter.length) filter += 'AND ';
-		filter += `(${postedBy.map(uid => `uid = ${uid}`).join(' OR ')}) `;
+		filter.push(postedBy.map(uid => `uid = ${uid}`));
 	}
 	if (timeFilter) {
-		if (filter.length) filter += 'AND ';
-		filter += `timestamp ${timeFilter === 'newer' ? '>' : '<'} ${Date.now() - timeRange} `;
+		filter.push(`timestamp ${timeFilter === 'newer' ? '>' : '<'} ${Date.now() - timeRange}`);
 	}
 	if (tid) {
-		if (filter.length) filter += 'AND ';
-		filter += `tid = ${tid}`;
+		filter.push(`tid = ${tid}`);
 	}
-	filter = filter.trimEnd();
 	return filter.length ? filter : undefined;
 };
 
