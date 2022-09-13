@@ -420,26 +420,19 @@ plugin.search = async function (data) {
 plugin.buildFilter = function (categories, postedBy, timeFilter, timeRange, tid) {
 	let filter = '';
 	if (categories?.length) {
-		filter += '( ';
-		for (const cid of categories) {
-			filter += `cid = ${cid} OR `;
-		}
-		filter += ') ';
+		filter += `(${categories.map(cid => `cid = ${cid}`).join(' OR ')}) `;
 	}
 	if (postedBy?.length) {
-		if (filter.length) filter += 'AND';
-		filter += '( ';
-		for (const uid of postedBy) {
-			filter += `uid = ${uid} OR `;
-		}
-		filter += ') ';
+		if (filter.length) filter += 'AND ';
+		filter += `(${postedBy.map(uid => `uid = ${uid}`).join(' OR ')}) `;
 	}
 	if (timeFilter) {
 		if (filter.length) filter += 'AND ';
-		filter += `timestamp ${timeFilter === 'newer' ? '>' : '<'} ${Date.now() - timeRange}`;
+		filter += `timestamp ${timeFilter === 'newer' ? '>' : '<'} ${Date.now() - timeRange} `;
 	}
 	if (tid) {
-		filter += ` AND tid = ${tid}`;
+		if (filter.length) filter += 'AND ';
+		filter += `tid = ${tid}`;
 	}
 	filter = filter.trimEnd();
 	return filter.length ? filter : undefined;
