@@ -1,6 +1,6 @@
 {
 	"name": "nodebb-plugin-meilisearch",
-	"version": "0.5.6",
+	"version": "0.5.7",
 	"description": "A plugin for integrating MeiliSearch with NodeBB",
 	"main": "library.js",
 	"repository": {
@@ -35,7 +35,7 @@
 	},
 	"readmeFilename": "README.md",
 	"nbbpm": {
-		"compatibility": "^2.5.0"
+		"compatibility": "^1.18.0 || ^2.0.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "17.1.2",
