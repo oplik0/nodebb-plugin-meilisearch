@@ -79,9 +79,9 @@ pubsub.on('meilisearch:init', (initializing) => {
 });
 
 plugin.init = async function (params) {
-	const { router /* , middleware , controllers */ } = params;
+	const { router, middleware } = params;
 	winston.debug('[plugin/meilisearch] Initializing MeiliSearch plugin');
-	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], (req, res) => {
+	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', middleware, [], (req, res) => {
 		res.render('admin/plugins/meilisearch', {
 			indexing: plugin.indexing,
 			topicPercent: Math.round(100 * plugin.indexing.topic_progress.current / plugin.indexing.topic_progress.total),
