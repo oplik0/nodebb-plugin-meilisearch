@@ -12,6 +12,9 @@ Make sure to disable `nodebb-plugin-dbsearch` when using this plugin.
 
 3. Set your URL and API Key in the ACP under `admin/plugins/meilisearch`
 
+> **Warning**
+> Currently this plugin doesn't do a good job of informing the user about configuration errors, make sure your Meilisearch instance is reachable by NodeBB and that the plugin is configured correctly
+
 ## Screenshots
 
 #### ACP:
