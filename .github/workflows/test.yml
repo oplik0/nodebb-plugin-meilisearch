@@ -69,8 +69,7 @@ jobs:
               "mongo:port": 27017,
               "mongo:username": "",
               "mongo:password": "",
-              "mongo:database": "nodebb",
-              "test_plugins": ["${{ github.event.repository.name }}"]
+              "mongo:database": "nodebb"
             }
           CI: >-
             {
@@ -83,3 +82,5 @@ jobs:
 
       - name: Node tests
         run: yarn test test/plugins-installed.js
+        env:
+          TEST_PLUGINS: ${{ github.event.repository.name }}
