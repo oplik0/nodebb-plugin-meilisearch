@@ -75,7 +75,8 @@ jobs:
             {
               "host": "127.0.0.1",
               "port": 27017,
-              "database": "ci_test"
+              "database": "ci_test",
+              "test_plugins": ["${{ github.event.repository.name }}"]
             }
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
