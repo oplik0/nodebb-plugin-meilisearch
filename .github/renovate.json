@@ -1,0 +1,34 @@
+{
+    "extends": [
+        "config:base",
+        ":docker",
+        ":label(dependencies)",
+        ":semanticCommits",
+        ":semanticCommitTypeAll(chore)",
+        ":semanticCommitScope({{parentDir}})",
+        ":automergeRequireAllStatusChecks",
+        ":maintainLockFilesWeekly",
+        ":timezone(Europe/Warsaw)",
+        "preview:dockerCompose",
+        "preview:dockerVersions",
+        "docker:enableMajor",
+        "schedule:weekdays"
+    ],
+    "assigneesFromCodeOwners": true,
+    "packageRules": [
+        {
+            "matchUpdateTypes": [
+                "minor",
+                "patch",
+                "pin",
+                "digest",
+                "lockFileMaintenance",
+                "bump"
+            ],
+            "automerge": true,
+            "automergeType": "branch"
+        }
+    ],
+    "rangeStrategy": "auto",
+    "updateLockFiles": true
+}
