@@ -1,0 +1,12 @@
+/* Place any LESS in here */
+
+#reindex-force-container {
+    margin-top: -3px;
+}
+
+.reindex-progress-container {
+    transition: display 0.5s;
+}
+.reindex-progress-bar {
+    transition: width 0.1s;
+}

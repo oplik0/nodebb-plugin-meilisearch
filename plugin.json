@@ -75,6 +75,9 @@
 	"staticDirs": {
 		"static": "./static"
 	},
+	"scss": [
+		"static/scss/meilisearch.scss"
+	],
 	"less": [
 		"static/less/meilisearch.less"
 	],

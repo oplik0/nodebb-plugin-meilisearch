@@ -79,9 +79,9 @@ pubsub.on('meilisearch:init', (initializing) => {
 });
 
 plugin.init = async function (params) {
-	const { router, middleware } = params;
+	const { router } = params;
 	winston.debug('[plugin/meilisearch] Initializing MeiliSearch plugin');
-	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', middleware, [], (req, res) => {
+	routeHelpers.setupAdminPageRoute(router, '/admin/plugins/meilisearch', [], (req, res) => {
 		res.render('admin/plugins/meilisearch', {
 			indexing: plugin.indexing,
 			topicPercent: Math.round(100 * plugin.indexing.topic_progress.current / plugin.indexing.topic_progress.total),
@@ -428,8 +428,8 @@ plugin.buildFilter = function (categories, postedBy, timeFilter, timeRange, tid)
 	if (postedBy?.length) {
 		filter.push(postedBy.map(uid => `uid = ${uid}`));
 	}
-	if (timeFilter) {
-		filter.push(`timestamp ${timeFilter === 'newer' ? '>' : '<'} ${Date.now() - timeRange}`);
+	if (timeFilter && timeRange) {
+		filter.push(`timestamp ${timeFilter === 'newer' ? '>' : '<'} ${Date.now() - (timeRange * 1000)}`);
 	}
 	if (tid) {
 		filter.push(`tid = ${tid}`);
