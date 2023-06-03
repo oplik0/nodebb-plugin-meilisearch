@@ -51,7 +51,7 @@ jobs:
         with:
           path: tested_plugin
       - name: Install the tested plugin
-        run: yarn add portal:tested_plugin
+        run: yarn add file:./tested_plugin
 
       - name: Setup on MongoDB
         env:
