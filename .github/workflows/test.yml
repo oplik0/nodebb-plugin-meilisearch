@@ -1,4 +1,4 @@
-name: Lint and test
+name: Test
 
 on:
   push:
@@ -80,11 +80,6 @@ jobs:
             }
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
-      - name: Run ESLint
-        run: yarn lint
 
       - name: Node tests
         run: yarn test test/plugins-installed.js
-
-      - name: Extract coverage info
-        run: yarn coverage
