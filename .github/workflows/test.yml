@@ -44,14 +44,14 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: yarn Install
-        run: yarn install
+        run: yarn
 
       # set up the tested plugin
       - uses: actions/checkout@v3
         with:
           path: tested_plugin
       - name: Install the tested plugin
-        run: yarn install portal:tested_plugin
+        run: yarn add portal:tested_plugin
 
       - name: Setup on MongoDB
         env:
