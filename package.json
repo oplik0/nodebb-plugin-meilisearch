@@ -48,6 +48,6 @@
 		"lint-staged": "13.0.3"
 	},
 	"dependencies": {
-		"meilisearch": "^0.32.5"
+		"meilisearch": "^0.34.0"
 	}
 }
