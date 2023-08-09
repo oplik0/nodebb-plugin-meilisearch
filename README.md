@@ -6,7 +6,7 @@ Make sure to disable `nodebb-plugin-dbsearch` when using this plugin.
 
 ## Installation
 
-1. Make sure you have access to an instance of [Meilisearch](https://www.meilisearch.com/)
+1. Make sure you have access to an instance of [Meilisearch](https://www.meilisearch.com/). This can be meilisearch cloud or a local instance (see [their docs](https://www.meilisearch.com/docs/learn/getting_started/installation) for installation instructions)
 
 2. Install the plugin: `npm install nodebb-plugin-meilisearch` (or just use the ACP)
 
