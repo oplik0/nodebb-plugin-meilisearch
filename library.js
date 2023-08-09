@@ -403,7 +403,7 @@ plugin.search = async function (data) {
 	}
 	winston.debug(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
 	const searchData = data?.searchData;
-	const id = `${data?.index?.length ? data?.index[0] : 'post'}id`;
+	const id = `${data?.index?.length ? data?.index[0] : 'p'}id`;
 	const result = await plugin.client.index(data.index).search(data.content, {
 		attributesToRetrieve: [id],
 		limit: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
