@@ -398,12 +398,14 @@ plugin.search = async function (data) {
 	// topic search uses term instead of content
 	if (data.term) {
 		data.content = data.term;
-		data.index = ['post'];
+		data.index = 'post';
 		data.searchData = { tid: data.tid };
 	}
 	winston.debug(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
 	const searchData = data?.searchData;
-	const id = `${data?.index?.length ? data?.index[0] : 'p'}id`;
+	const index = Array.isArray(data?.index) ? data.index[0] : data.index;
+	const id = `${index?.length ? index[0] : 'p'}id`;
+	console.log(`id: ${id}`);
 	const result = await plugin.client.index(data.index).search(data.content, {
 		attributesToRetrieve: [id],
 		limit: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
@@ -417,6 +419,7 @@ plugin.search = async function (data) {
 		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
 	});
 	data.ids = result.hits.map(hit => hit[id]);
+	console.log(data);
 	return data;
 };
 
