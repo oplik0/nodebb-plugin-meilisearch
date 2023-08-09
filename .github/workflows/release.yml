@@ -1,20 +1,34 @@
-name: Publish NPM package
-
 on:
-  release:
-    types: [created]
-
+  push:
+    branches:
+    - main
+name: release-please
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
-  publish-npm:
+  release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          registry-url: https://registry.npmjs.org/
-          cache: "yarn"
-      - run: yarn
-      - run: yarn publish --new-version=${{ github.event.release.tag_name }}
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+    - uses: google-github-actions/release-please-action@v3
+      id: release
+      with:
+        release-type: node
+        package-name: nodebb-plugin-total-vote-count
+    # The logic below handles the npm publication:
+    - uses: actions/checkout@v3
+      # these if statements ensure that a publication only occurs when
+      # a new release is created:
+      if: ${{ steps.release.outputs.release_created }}
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: yarn
+        registry-url: 'https://registry.npmjs.org'
+      if: ${{ steps.release.outputs.release_created }}
+    - run: yarn
+      if: ${{ steps.release.outputs.release_created }}
+    - run: yarn publish
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      if: ${{ steps.release.outputs.release_created }}
