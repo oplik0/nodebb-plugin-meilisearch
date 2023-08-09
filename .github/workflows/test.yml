@@ -55,6 +55,10 @@ jobs:
         ports:
           # Maps port 27017 on service container to the host
           - 27017:27017
+      meilisearch:
+        image: getmeili/meilisearch:latest
+        ports:
+          - 7700:7700
     steps:
       - uses: actions/checkout@v3
         with:
