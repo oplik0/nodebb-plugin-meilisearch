@@ -10,6 +10,7 @@ const Topics = require.main.require('./src/topics');
 const batch = require.main.require('./src/batch');
 const Sockets = require.main.require('./src/socket.io');
 const pubsub = require.main.require('./src/pubsub');
+const plugins = require.main.require('./src/plugins');
 
 const plugin = {};
 
@@ -383,11 +384,14 @@ plugin.checkConflict = function () {
 
 plugin.search = async function (data) {
 	if (plugin.checkConflict()) {
-		// The dbsearch plugin was detected, abort search!
-		winston.warn(
-			'[plugin/meilisearch] Another search plugin (dbsearch) is enabled, so search via Meilisearch was aborted.',
-		);
-		return data;
+		if (await plugins.isActive('nodebb-plugin-dbsearch')) {
+			// The dbsearch plugin was detected, abort search!
+			winston.warn(
+				'[plugin/meilisearch] Another search plugin (dbsearch) is enabled, so search via Meilisearch was aborted.',
+			);
+			return data;
+		}
+		winston.warn('[plugin/meilisearch] dbsearch plugin is inactive but still loaded, you might want to restart NodeBB');
 	}
 	if (!plugin.healthy && !(await plugin.checkHealth())) {
 		winston.warn(
