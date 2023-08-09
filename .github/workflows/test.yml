@@ -1,59 +1,98 @@
-name: Test
-
 on:
   push:
-
-defaults:
-  run:
-    shell: bash
+  pull_request:
 
 permissions:
   contents: read
 
+name: Test
 jobs:
   test:
-    permissions:
-      contents: read # for actions/checkout to fetch code
-    name: Lint and test
+    runs-on: ${{ matrix.os }}
+    name: "Test Plugin on NodeBB ${{ matrix.nodebb }} (Node.js ${{ matrix.node }}, ${{ matrix.database }}${{ matrix.lint && ', linting enabled' }})"  
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        node: [16, 18]
-    runs-on: ${{ matrix.os }}
-    env:
-      TEST_ENV: ${{ matrix.test_env || 'production' }}
-
+        node: [16, 18] # versions currently supported by NodeBB
+        database: [mongo] # you can add redis and postgres here if you're touching the database more directly
+        nodebb: [master, v3.x] # branches or tags
+        include:
+          - os: ubuntu-latest
+            node: 18
+            database: mongo
+            nodebb: master
+            lint: true # we only want to lint once
     services:
+      postgres:
+        image: ${{ startsWith(matrix.database, 'postgres') && 'postgres:15-alpine' || '' }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 5432 on service container to the host
+          - 5432:5432
+
+      redis:
+        image: ${{ startsWith(matrix.database, 'redis') && 'redis:7.0.11' || '' }}
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+
       mongo:
-        image: "mongo:6.0"
+        image: ${{ startsWith(matrix.database, 'mongo') && 'mongo:3.7' || ''}}
         ports:
           # Maps port 27017 on service container to the host
           - 27017:27017
-
     steps:
       - uses: actions/checkout@v3
         with:
           repository: NodeBB/NodeBB
-
-      - run: cp install/package.json package.json
-
-      - name: Install Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: yarn Install
-        run: yarn
-
-      # set up the tested plugin
+          ref: ${{ matrix.nodebb }}
       - uses: actions/checkout@v3
         with:
-          path: tested_plugin
-      - name: Install the tested plugin
-        run: yarn add file:./tested_plugin
-
+          path: tested-plugin
+      - run: cp install/package.json package.json
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run ESLint
+        if: matrix.lint
+        working-directory: tested-plugin
+        run: |
+          yarn
+          yarn lint --config $GITHUB_WORKSPACE/tested-plugin/.eslintrc --no-eslintrc
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - uses: actions/cache@v3
+        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Get plugin name
+        id: pluginName
+        run: echo "NAME=$(node -e "console.log(require('./tested-plugin/package.json').name)")" >> "$GITHUB_OUTPUT"
+      - name: Install dependencies
+        run: npm install
+      - name: Install tested plugin
+        run: npm install --save ./tested-plugin
       - name: Setup on MongoDB
+        if: startsWith(matrix.database, 'mongo')
         env:
           SETUP: >-
             {
@@ -75,13 +114,67 @@ jobs:
             {
               "host": "127.0.0.1",
               "port": 27017,
-              "database": "ci_test",
-              "test_plugins": ["${{ github.event.repository.name }}"]
+              "database": "ci_test"
             }
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
-
-      - name: Node tests
-        run: yarn test test/plugins-installed.js
+      - name: Setup on PostgreSQL
+        if: startsWith(matrix.database, 'postgres')
         env:
-          TEST_PLUGINS: ${{ github.event.repository.name }}
+          SETUP: >-
+            {
+              "url": "http://127.0.0.1:4567",
+              "secret": "abcdef",
+              "admin:username": "admin",
+              "admin:email": "test@example.org",
+              "admin:password": "hAN3Eg8W",
+              "admin:password:confirm": "hAN3Eg8W",
+
+              "database": "postgres",
+              "postgres:host": "127.0.0.1",
+              "postgres:port": 5432,
+              "postgres:username": "postgres",
+              "postgres:password": "postgres",
+              "postgres:database": "nodebb"
+            }
+          CI: >-
+            {
+              "host": "127.0.0.1",
+              "database": "ci_test",
+              "port": 5432,
+              "username": "postgres",
+              "password": "postgres"
+            }
+        run: |
+          node -e "const { Client } = require('pg'); const c = new Client({ host: '127.0.0.1', port: 5432, user: 'postgres', password: 'postgres' }); c.connect().then(() => c.query('CREATE DATABASE nodebb')).then(() => c.query('CREATE DATABASE ci_test')).then(() => c.end())"
+          node app --setup="${SETUP}" --ci="${CI}"
+
+      - name: Setup on Redis
+        if: startsWith(matrix.database, 'redis')
+        env:
+          SETUP: >-
+            {
+              "url": "http://127.0.0.1:4567/forum",
+              "secret": "abcdef",
+              "admin:username": "admin",
+              "admin:email": "test@example.org",
+              "admin:password": "hAN3Eg8W",
+              "admin:password:confirm": "hAN3Eg8W",
+              "database": "redis",
+              "redis:host": "127.0.0.1",
+              "redis:port": 6379,
+              "redis:password": "",
+              "redis:database": 0
+            }
+          CI: >-
+            {
+              "host": "127.0.0.1",
+              "database": 1,
+              "port": 6379
+            }
+        run: |
+          node app --setup="${SETUP}" --ci="${CI}"
+      - name: Add tested plugin to config
+        run: jq '.test_plugins = ["${{ steps.pluginName.outputs.NAME }}"]' config.json > config.json.tmp && mv config.json.tmp config.json
+      - name: Run tests
+        run: npm test test/plugins-installed.js
