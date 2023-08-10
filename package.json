@@ -1,9 +1,8 @@
 {
 	"name": "nodebb-plugin-meilisearch",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "A plugin for integrating MeiliSearch with NodeBB",
 	"main": "library.js",
-	
 	"scripts": {
 		"lint": "eslint . --ext .js --config .eslintrc",
 		"lint:fix": "eslint . --ext .js --fix --config .eslintrc"
