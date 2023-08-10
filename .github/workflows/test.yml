@@ -74,12 +74,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+      - name: Install plugin dependencies
+        working-directory: tested-plugin
+        run: yarn
       - name: Run ESLint
         if: matrix.lint
         working-directory: tested-plugin
-        run: |
-          yarn
-          yarn lint
+        run: yarn lint
       - name: Get npm cache directory
         id: npm-cache-dir
         shell: bash
