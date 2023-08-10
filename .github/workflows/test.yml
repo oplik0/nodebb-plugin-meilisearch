@@ -68,7 +68,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: tested-plugin
-      - run: cp install/package.json package.json
+      - name: Prepare NodeBB package.json
+        run: cp install/package.json package.json
+        working-directory: nodebb
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
