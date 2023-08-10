@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-latest]
         node: [16, 18] # versions currently supported by NodeBB
         database: [mongo] # you can add redis and postgres here if you're touching the database more directly
-        nodebb: [master, v3.x] # branches or tags
+        nodebb: [master, v3.x, v2.x] # branches or tags
         include:
           - os: ubuntu-latest
             node: 18
@@ -64,6 +64,7 @@ jobs:
         with:
           repository: NodeBB/NodeBB
           ref: ${{ matrix.nodebb }}
+          path: nodebb
       - uses: actions/checkout@v3
         with:
           path: tested-plugin
@@ -76,7 +77,7 @@ jobs:
         working-directory: tested-plugin
         run: |
           yarn
-          yarn lint --config $GITHUB_WORKSPACE/tested-plugin/.eslintrc --no-eslintrc
+          yarn lint
       - name: Get npm cache directory
         id: npm-cache-dir
         shell: bash
@@ -93,8 +94,10 @@ jobs:
         run: echo "NAME=$(node -e "console.log(require('./tested-plugin/package.json').name)")" >> "$GITHUB_OUTPUT"
       - name: Install dependencies
         run: npm install
+        working-directory: nodebb
       - name: Install tested plugin
-        run: npm install --save ./tested-plugin
+        run: npm install --save $GITHUB_WORKSPACE/tested-plugin
+        working-directory: nodebb
       - name: Setup on MongoDB
         if: startsWith(matrix.database, 'mongo')
         env:
@@ -122,6 +125,7 @@ jobs:
             }
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
+        working-directory: nodebb
       - name: Setup on PostgreSQL
         if: startsWith(matrix.database, 'postgres')
         env:
@@ -152,7 +156,7 @@ jobs:
         run: |
           node -e "const { Client } = require('pg'); const c = new Client({ host: '127.0.0.1', port: 5432, user: 'postgres', password: 'postgres' }); c.connect().then(() => c.query('CREATE DATABASE nodebb')).then(() => c.query('CREATE DATABASE ci_test')).then(() => c.end())"
           node app --setup="${SETUP}" --ci="${CI}"
-
+        working-directory: nodebb
       - name: Setup on Redis
         if: startsWith(matrix.database, 'redis')
         env:
@@ -178,7 +182,10 @@ jobs:
             }
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
+        working-directory: nodebb
       - name: Add tested plugin to config
         run: jq '.test_plugins = ["${{ steps.pluginName.outputs.NAME }}"]' config.json > config.json.tmp && mv config.json.tmp config.json
+        working-directory: nodebb
       - name: Run tests
         run: npm test test/plugins-installed.js
+        working-directory: nodebb
