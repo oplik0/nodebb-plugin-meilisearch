@@ -1,3 +1,4 @@
+[![Test](https://github.com/oplik0/nodebb-plugin-meilisearch/actions/workflows/test.yml/badge.svg)](https://github.com/oplik0/nodebb-plugin-meilisearch/actions/workflows/test.yml)
 # Meilisearch Plugin for NodeBB
 
 A search plugin integrating [Meilisearch](https://www.meilisearch.com/).
