@@ -379,19 +379,33 @@ plugin.deindexTopic = async function ({ topic }) {
 
 // stolen from solr plugin
 plugin.checkConflict = function () {
-	return !!module.parent.exports.libraries['nodebb-plugin-dbsearch'];
+	const hooksToCheck = [
+		'filter:search.query',
+		'filter:topic.search',
+	];
+	// blacklist, in case someone makes a plugin using these hooks that doesn't conflict.
+	// also, outside of dbsearch the user is expected to realize they installed two search plugins.
+	const conflictingPlugins = [
+		'nodebb-plugin-dbsearch',
+		'nodebb-plugin-solr',
+		'nodebb-plugin-elasticsearch',
+		'ndoebb-plugin-search-elasticsearch',
+	]
+	for (const hook of hooksToCheck) {
+		if (plugins.loadedHooks[hook].filter(hookData => conflictingPlugins.includes(hookData.id)).length >= 1) {
+			return true;
+		}
+	}
+	return false;
 };
 
 plugin.search = async function (data) {
 	if (plugin.checkConflict()) {
-		if (await plugins.isActive('nodebb-plugin-dbsearch')) {
-			// The dbsearch plugin was detected, abort search!
-			winston.warn(
-				'[plugin/meilisearch] Another search plugin (dbsearch) is enabled, so search via Meilisearch was aborted.',
-			);
-			return data;
-		}
-		winston.warn('[plugin/meilisearch] dbsearch plugin is inactive but still loaded, you might want to restart NodeBB');
+		// The dbsearch plugin was detected, abort search!
+		winston.warn(
+			'[plugin/meilisearch] Another search plugin (most likely dbsearch) is enabled, so search via Meilisearch was aborted.',
+		);
+		return data;
 	}
 	if (!plugin.healthy && !(await plugin.checkHealth())) {
 		winston.warn(
