@@ -377,7 +377,6 @@ plugin.deindexTopic = async function ({ topic }) {
 	await plugin.client.index('topic').deleteDocument(topic.tid);
 };
 
-// stolen from solr plugin
 plugin.checkConflict = function () {
 	const hooksToCheck = [
 		'filter:search.query',
