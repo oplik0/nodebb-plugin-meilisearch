@@ -72,7 +72,6 @@ describe('nodebb-plugin-meilisearch', () => {
 			searchIn: 'titles',
 			query: 'Test Meilisearch Topic Title',
 		});
-		console.log(results);
 		assert(Array.isArray(results.posts), 'Search result is not an array');
 		assert.strictEqual(results.posts.filter(post => post.pid === postData.pid).length, 1, 'Post id not in results');
 	});

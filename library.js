@@ -390,7 +390,7 @@ plugin.checkConflict = function () {
 		'nodebb-plugin-solr',
 		'nodebb-plugin-elasticsearch',
 		'ndoebb-plugin-search-elasticsearch',
-	]
+	];
 	for (const hook of hooksToCheck) {
 		if (plugins.loadedHooks[hook].filter(hookData => conflictingPlugins.includes(hookData.id)).length >= 1) {
 			return true;
@@ -423,7 +423,6 @@ plugin.search = async function (data) {
 	const searchData = data?.searchData;
 	const index = Array.isArray(data?.index) ? data.index[0] : data.index;
 	const id = `${index?.length ? index[0] : 'p'}id`;
-	console.log(`id: ${id}`);
 	const result = await plugin.client.index(data.index).search(data.content, {
 		attributesToRetrieve: [id],
 		limit: parseInt(await settings.getOne(plugin.id, 'maxDocuments') || 500, 10),
@@ -437,7 +436,6 @@ plugin.search = async function (data) {
 		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
 	});
 	data.ids = result.hits.map(hit => hit[id]);
-	console.log(data);
 	return data;
 };
 
