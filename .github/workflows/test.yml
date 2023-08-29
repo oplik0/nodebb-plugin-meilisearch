@@ -22,6 +22,10 @@ jobs:
             database: mongo
             nodebb: master
             lint: true # we only want to lint once
+          - os: ubuntu-latest # prepare for new node version
+            node: 20
+            database: mongo
+            nodebb: master
         exclude:
           # pre-release means living on the edge... of LTS releases too I guess
           - nodebb: master
