@@ -100,10 +100,10 @@ jobs:
         id: pluginName
         run: echo "NAME=$(node -e "console.log(require('./tested-plugin/package.json').name)")" >> "$GITHUB_OUTPUT"
       - name: Install dependencies
-        run: npm install
+        run: yarn
         working-directory: nodebb
       - name: Install tested plugin
-        run: npm install --save $GITHUB_WORKSPACE/tested-plugin
+        run: yarn add $GITHUB_WORKSPACE/tested-plugin
         working-directory: nodebb
       - name: Setup on MongoDB
         if: startsWith(matrix.database, 'mongo')

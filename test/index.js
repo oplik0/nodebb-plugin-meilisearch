@@ -19,6 +19,7 @@
 /* globals describe, it, before */
 
 const assert = require('assert');
+const { scheduler } = require("timers/promises");
 
 const winston = require.main.require('winston');
 
@@ -63,6 +64,8 @@ describe('nodebb-plugin-meilisearch', () => {
 			tid: topicData.tid,
 			content: 'The content of test reply',
 		});
+		// ensure the posts are indexed
+		await scheduler.wait(250);
 	});
 
 	it('should find the initial topic by full title', async () => {
