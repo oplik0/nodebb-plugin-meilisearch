@@ -4,8 +4,8 @@
 	"description": "A plugin for integrating MeiliSearch with NodeBB",
 	"main": "library.js",
 	"scripts": {
-		"lint": "eslint . --ext .js --config .eslintrc",
-		"lint:fix": "eslint . --ext .js --fix --config .eslintrc"
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix"
 	},
 	"repository": {
 		"type": "git",
@@ -44,6 +44,8 @@
 	"devDependencies": {
 		"@commitlint/cli": "19.5.0",
 		"@commitlint/config-angular": "19.5.0",
+		"@eslint/eslintrc": "^3.2.0",
+		"@eslint/js": "^9.15.0",
 		"dprint": "^0.47.5",
 		"eslint": "9.15.0",
 		"eslint-config-nodebb": "0.2.1",

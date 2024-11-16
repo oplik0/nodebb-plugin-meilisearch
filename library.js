@@ -420,7 +420,7 @@ plugin.search = async function (data) {
 	}
 	// select any/all matches
 	if (data.matchWords && data.matchWords === 'all') {
-		data.content = data.content.split(" ").map(x => `"${x}"`).join(' ')
+		data.content = data.content.split(' ').map(x => `"${x}"`).join(' ');
 	}
 	winston.debug(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
 	const searchData = data?.searchData;
