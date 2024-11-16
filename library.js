@@ -418,10 +418,6 @@ plugin.search = async function (data) {
 		data.index = 'post';
 		data.searchData = { tid: data.tid };
 	}
-	// select any/all matches
-	if (data.matchWords && data.matchWords === 'all') {
-		data.content = data.content.split(' ').map(x => `"${x}"`).join(' ');
-	}
 	winston.debug(`[plugin/meilisearch] Searching for ${data.content} in ${data.index}`);
 	const searchData = data?.searchData;
 	const index = Array.isArray(data?.index) ? data.index[0] : data.index;
@@ -437,6 +433,7 @@ plugin.search = async function (data) {
 			searchData?.tid,
 		),
 		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
+		matchingStrategy: data.matchWords === "all" ? "all" : "last"
 	});
 	data.ids = result.hits.map(hit => hit[id]);
 	return data;
