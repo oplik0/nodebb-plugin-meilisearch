@@ -433,7 +433,7 @@ plugin.search = async function (data) {
 			searchData?.tid,
 		),
 		sort: plugin.buildSort(searchData?.sortBy, searchData?.sortDirection),
-		matchingStrategy: data.matchWords === "all" ? "all" : "last"
+		matchingStrategy: data.matchWords === 'all' ? 'all' : 'last',
 	});
 	data.ids = result.hits.map(hit => hit[id]);
 	return data;
