@@ -37,6 +37,7 @@ describe('nodebb-plugin-meilisearch', () => {
 	let responseData;
 	let cid;
 	before(async () => {
+		console.log('test');
 		plugins.hooks.unregister('nodebb-plugin-dbsearch', 'filter:search.query', 'filterSearchQuery');
 		plugins.hooks.unregister('nodebb-plugin-dbsearch', 'filter:topic.search', 'filterSearchTopic');
 		plugins.hooks.unregister('nodebb-plugin-dbsearch', 'filter:messaging.searchMessages', 'filterMessagingSearchMessages');
@@ -44,15 +45,12 @@ describe('nodebb-plugin-meilisearch', () => {
 
 		const { active } = await plugins.toggleActive('nodebb-plugin-dbsearch');
 		winston.info(`dbsearch plugin ${active ? 'enabled' : 'disabled'}`);
-
-		[authorUid, commenterUid, { cid }] = await Promise.all([
-			user.create({ username: 'totalVotesAuthor' }),
-			user.create({ username: 'totalVotesCommenter' }),
-			categories.create({
-				name: 'Test Category',
-				description: 'Test category created by testing script',
-			}),
-		]);
+		authorUid = await user.create({ username: 'totalVotesAuthor' });
+		commenterUid = await user.create({ username: 'totalVotesCommenter' });
+		({ cid } = await categories.create({
+			name: 'Test Category',
+			description: 'Test category created by testing script',
+		}));
 		({ postData, topicData } = await topics.post({
 			uid: authorUid,
 			cid: cid,
