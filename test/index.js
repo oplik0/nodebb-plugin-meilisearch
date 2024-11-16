@@ -19,7 +19,7 @@
 /* globals describe, it, before */
 
 const assert = require('assert');
-const { scheduler } = require("timers/promises");
+const { scheduler } = require('timers/promises');
 
 const winston = require.main.require('winston');
 
