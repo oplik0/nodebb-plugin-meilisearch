@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.2](https://github.com/oplik0/nodebb-plugin-meilisearch/compare/v0.7.1...v0.7.2) (2024-11-16)
+
+
+### Bug Fixes
+
+* eslint ([31f1df4](https://github.com/oplik0/nodebb-plugin-meilisearch/commit/31f1df4036d6823889bc7a1633737e4d52a4f9c7))
+* support match words ([ef6f821](https://github.com/oplik0/nodebb-plugin-meilisearch/commit/ef6f821ad1aa45f632ce4179122efd1b174086d0)), closes [#42](https://github.com/oplik0/nodebb-plugin-meilisearch/issues/42)
+* support matchWords *correctly* ([74a62e9](https://github.com/oplik0/nodebb-plugin-meilisearch/commit/74a62e92e9c75ab6058d4ec1aa61aa3b928e3b61))
+* udpate devcontainer ([f00419e](https://github.com/oplik0/nodebb-plugin-meilisearch/commit/f00419edec832e315cf72764b348c9942a08e471))
+
 ## [0.7.1](https://github.com/oplik0/nodebb-plugin-meilisearch/compare/v0.7.0...v0.7.1) (2023-10-14)
 
 
