@@ -1922,10 +1922,10 @@ log-update@^6.1.0:
     strip-ansi "^7.1.0"
     wrap-ansi "^9.0.0"
 
-meilisearch@^0.46.0:
-  version "0.46.0"
-  resolved "https://registry.yarnpkg.com/meilisearch/-/meilisearch-0.46.0.tgz#ffa3f6c28809e5d42f81817236c3b29652635832"
-  integrity sha512-bx0tei1B+Ke0Y02pCoqmcwfpkwuDf+/ZkQDVDvb+ZfGDpWaxq9Z7sE5kc3o8zWvP6wJE7e3PoU3Oy6WINqq5bw==
+meilisearch@^0.47.0:
+  version "0.47.0"
+  resolved "https://registry.yarnpkg.com/meilisearch/-/meilisearch-0.47.0.tgz#376bda5d65f7dd7b80e1ad317912664c4a02b05f"
+  integrity sha512-Qq+hatuDJ0z5c+szVb0O/uI7Z2jfMUjj8eNB6xPyKp9Og7GVnrOZJRVoDPqGoVY484Iwh+F61y2UreIetda00w==
 
 meow@^12.0.1:
   version "12.1.1"
