@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.4](https://github.com/oplik0/nodebb-plugin-meilisearch/compare/v0.7.3...v0.7.4) (2025-01-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency meilisearch to ^0.47.0 ([#59](https://github.com/oplik0/nodebb-plugin-meilisearch/issues/59)) ([6abea6b](https://github.com/oplik0/nodebb-plugin-meilisearch/commit/6abea6b36caa4070bbefb03e271133c04ac2b4f3))
+
 ## [0.7.3](https://github.com/oplik0/nodebb-plugin-meilisearch/compare/v0.7.2...v0.7.3) (2024-12-02)
 
 
