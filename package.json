@@ -1,6 +1,6 @@
 {
 	"name": "nodebb-plugin-meilisearch",
-	"version": "0.7.3",
+	"version": "0.7.4",
 	"description": "A plugin for integrating MeiliSearch with NodeBB",
 	"main": "library.js",
 	"scripts": {
