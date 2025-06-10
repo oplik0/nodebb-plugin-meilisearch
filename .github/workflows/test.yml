@@ -14,19 +14,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [18, 20] # versions currently supported by NodeBB
+        node: [20, 22] # versions currently supported by NodeBB
         database: [mongo] # you can add redis and postgres here if you're touching the database more directly
-        nodebb: [master, v3.x, v2.x] # branches or tags
+        nodebb: [master, v4.x, v3.x] # branches or tags
         include:
           - os: ubuntu-latest
-            node: 18
+            node: 22
             database: mongo
             nodebb: master
             lint: true # we only want to lint once
         exclude:
           # pre-release means living on the edge... of LTS releases too I guess
           - nodebb: master
-            node: 18
+            node: 20
     services:
       postgres:
         image: ${{ startsWith(matrix.database, 'postgres') && 'postgres:15-alpine' || '' }}
