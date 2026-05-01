@@ -1,23 +1,10 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+'use strict';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
+import serverConfig from 'eslint-config-nodebb';
+import publicConfig from 'eslint-config-nodebb/public';
 
-export default [...compat.extends("nodebb"), {
-    languageOptions: {
-        ecmaVersion: 2020,
-        sourceType: "script",
-    },
-}, 
-{
-    ignores: ["**/node_modules/**", ".devcontainer/**", "eslint.config.mjs", "static/**"],
-}
+export default [
+	...publicConfig,
+	...serverConfig,
 ];
+

@@ -457,7 +457,7 @@ plugin.buildFilter = function (categories, postedBy, timeFilter, timeRange, tid)
 };
 
 plugin.buildSort = function (sortBy, sortDirection) {
-	let field = '';
+	let field;
 	switch (sortBy) {
 		case 'timestamp':
 			field = 'timestamp';

@@ -1,6 +1,0 @@
-{
-	"extends": "nodebb",
-	"parserOptions": {
-		"ecmaVersion": 2020
-	}
-}
