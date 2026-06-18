@@ -65,12 +65,12 @@ jobs:
         ports:
           - 7700:7700
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: NodeBB/NodeBB
           ref: ${{ matrix.nodebb }}
           path: nodebb
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: tested-plugin
       - name: Prepare NodeBB package.json
